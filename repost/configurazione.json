@@ -1,0 +1,14 @@
+{
+  "concessionario_slug": "enne-esse-auto-motorexpo-brescia",
+  "cartella_drive": "foto-drive",
+  "contatti_propri": {
+    "telefono": "+39 030 0985415",
+    "whatsapp": "+39 348 9379494"
+  },
+  "controlli_prima_di_rimuovere": 2,
+  "soglia_allarme_sparizione": 0.4,
+  "qualita_webp": 84,
+  "accesso_rete_locale": true,
+  "porta_dashboard": 8765,
+  "cloud_url": "https://Ennesseauto.github.io/enneesseauto-vetrina"
+}

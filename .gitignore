@@ -1,0 +1,12 @@
+# Escludi le foto grezze originali ad alta risoluzione (rimangono private sul PC / Google Drive)
+# Sul Cloud vengono pubblicate solo le miniature WebP ottimizzate in repost/dati/foto-extra/
+repost/foto-drive/
+
+# Cache Python e file temporanei
+__pycache__/
+*.py[cod]
+*.tmp
+.DS_Store
+Thumbs.db
+.venv/
+venv/

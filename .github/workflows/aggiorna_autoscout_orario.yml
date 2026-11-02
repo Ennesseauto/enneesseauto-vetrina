@@ -1,0 +1,46 @@
+name: Aggiornamento Orario AutoScout24 (H24)
+
+on:
+  schedule:
+    # Esegue automaticamente ogni ora al minuto 0 (24 ore su 24, anche a PC spento)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Permette anche l'avvio manuale con un clic da GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  aggiorna-vetrina:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configura Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installa Pillow (per verifica immagini WebP)
+        run: pip install pillow
+
+      - name: Sincronizza annunci live da AutoScout24 preservando scelte Dashboard
+        env:
+          GITHUB_ACTIONS: "true"
+          AUTOSCOUT_PROXY_URL: ${{ secrets.AUTOSCOUT_PROXY_URL }}
+        run: python repost/strumenti/aggiorna_annunci.py --pausa 1.0
+
+      - name: Pubblica aggiornamenti su GitHub Pages
+        run: |
+          git config user.name "Motorexpo Bot H24"
+          git config user.email "bot@enneesseauto.local"
+          git add repost/dati/annunci.json repost/dati/annunci.js repost/dati/stato_manuale.json repost/dati/foto-extra
+          if ! git diff --staged --quiet; then
+            git commit -m "Aggiornamento orario automatico AutoScout24"
+            git pull --rebase --autostash origin main
+            git push origin main
+          else
+            echo "Nessuna variazione rilevata su AutoScout24."
+          fi
