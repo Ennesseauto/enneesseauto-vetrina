@@ -13,7 +13,7 @@
   }
 
   // Origine GitHub Pages bloccata (compilata automaticamente da setup_github.py)
-  const LOCKED_GITHUB_ORIGIN = 'https://Ennesseauto.github.io/enneesseauto-vetrina';
+  const LOCKED_GITHUB_ORIGIN = 'https://raw.githubusercontent.com/Ennesseauto/enneesseauto-vetrina/main';
   const IS_LOCAL_HOST = (location.hostname === '127.0.0.1' || location.hostname === 'localhost');
   const API_ORIGIN = 'http://127.0.0.1:8765';
 
