@@ -2,7 +2,7 @@
 # Sul Cloud vengono pubblicate solo le miniature WebP ottimizzate in repost/dati/foto-extra/
 repost/foto-drive/
 
-# Cache Python e file temporanei
+# Cache Python, credenziali locali e file temporanei
 __pycache__/
 *.py[cod]
 *.tmp
@@ -10,3 +10,6 @@ __pycache__/
 Thumbs.db
 .venv/
 venv/
+.gh_auth.json
+repost/strumenti/.gh_auth.json
+Dashboard_EnneEsseAuto_Setup.zip
