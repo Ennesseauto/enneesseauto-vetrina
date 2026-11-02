@@ -13,6 +13,7 @@ Questo modulo permette alla Dashboard locale (server_foto.py) di:
 import json
 import subprocess
 import threading
+import urllib.request
 from pathlib import Path
 
 CARTELLA_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -118,7 +119,16 @@ def sincronizza_cloud_ora(motivo: str = "Aggiornamento da Dashboard"):
                 text=True,
                 timeout=45,
             )
-            return push.returncode == 0
+            if push.returncode == 0:
+                try:
+                    urllib.request.urlopen(
+                        "https://purge.jsdelivr.net/gh/Ennesseauto/enneesseauto-vetrina@main/repost/dati/annunci.json",
+                        timeout=6,
+                    ).read()
+                except Exception:
+                    pass
+                return True
+            return False
         except Exception:
             return False
 

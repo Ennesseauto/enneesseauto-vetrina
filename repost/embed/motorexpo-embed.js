@@ -13,7 +13,7 @@
   }
 
   // Origine GitHub Pages bloccata (compilata automaticamente da setup_github.py)
-  const LOCKED_GITHUB_ORIGIN = 'https://raw.githubusercontent.com/Ennesseauto/enneesseauto-vetrina/main';
+  const LOCKED_GITHUB_ORIGIN = 'https://cdn.jsdelivr.net/gh/Ennesseauto/enneesseauto-vetrina@main';
   const IS_LOCAL_HOST = (location.hostname === '127.0.0.1' || location.hostname === 'localhost');
   const API_ORIGIN = 'http://127.0.0.1:8765';
 
@@ -982,10 +982,10 @@
   async function sincronizzaConCloud(forza = false) {
     if (!CLOUD_ORIGIN || serverLocaleAttivo) return;
     const ora = Date.now();
-    if (!forza && ora - ultimoCheckCloud < 30000) return;
+    if (!forza && ora - ultimoCheckCloud < 8000) return;
     ultimoCheckCloud = ora;
     try {
-      const resp = await fetch(`${CLOUD_ORIGIN}/repost/dati/annunci.json?t=${Math.floor(ora / 30000)}`, { cache: 'no-store' });
+      const resp = await fetch(`${CLOUD_ORIGIN}/repost/dati/annunci.json?t=${Math.floor(ora / 8000)}`, { cache: 'no-store' });
       if (!resp.ok) return;
       const d = await resp.json();
       if (!serverLocaleAttivo) {
