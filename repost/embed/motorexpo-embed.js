@@ -28,6 +28,10 @@
     return '';
   }
   const CLOUD_ORIGIN = rilevaCloudOrigin();
+  const GITHUB_REPO_MATCH = CLOUD_ORIGIN.match(/cdn\.jsdelivr\.net\/gh\/([^/]+\/[^/@]+)/i);
+  const GITHUB_REPO = GITHUB_REPO_MATCH ? GITHUB_REPO_MATCH[1] : 'Ennesseauto/enneesseauto-vetrina';
+  let cloudOriginDinamico = CLOUD_ORIGIN;
+  let ultimoShaCloud = '';
   // Se il progetto GitHub è collegato e siamo sul sito pubblico (non localhost),
   // blocchiamo la lettura ESCLUSIVAMENTE da quell'unico progetto GitHub Pages!
   const SOLO_DA_GITHUB = Boolean(CLOUD_ORIGIN && !IS_LOCAL_HOST);
@@ -96,7 +100,7 @@
     if (typeof base !== 'string') return '';
     if (base.startsWith(CDN_FOTO)) return `${base}/${MISURE[misura]}.webp`;
     if (RE_FOTO_EXTRA.test(base)) {
-      const origineFoto = (!serverLocaleAttivo && CLOUD_ORIGIN) ? CLOUD_ORIGIN : API_ORIGIN;
+      const origineFoto = (!serverLocaleAttivo && cloudOriginDinamico) ? cloudOriginDinamico : API_ORIGIN;
       return `${origineFoto}/repost/dati/${base}/${MISURE[misura]}.webp`;
     }
     return '';
@@ -982,10 +986,28 @@
   async function sincronizzaConCloud(forza = false) {
     if (!CLOUD_ORIGIN || serverLocaleAttivo) return;
     const ora = Date.now();
-    if (!forza && ora - ultimoCheckCloud < 8000) return;
+    if (!forza && ora - ultimoCheckCloud < 30000) return;
     ultimoCheckCloud = ora;
     try {
-      const resp = await fetch(`${CLOUD_ORIGIN}/repost/dati/annunci.json?t=${Math.floor(ora / 8000)}`, { cache: 'no-store' });
+      let urlDati = `${cloudOriginDinamico}/repost/dati/annunci.json?t=${Math.floor(ora / 8000)}`;
+      if (GITHUB_REPO) {
+        try {
+          const refResp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/ref/heads/main`, { cache: 'no-store' });
+          if (refResp.ok) {
+            const refData = await refResp.json();
+            const sha = refData && refData.object && refData.object.sha;
+            if (sha) {
+              cloudOriginDinamico = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@${sha}`;
+              if (sha === ultimoShaCloud && annunciTutti.length > 0) return;
+              ultimoShaCloud = sha;
+              urlDati = `${cloudOriginDinamico}/repost/dati/annunci.json`;
+            }
+          }
+        } catch (eRef) {
+          // Fallback al CDN @main in caso di errore API
+        }
+      }
+      const resp = await fetch(urlDati, { cache: 'no-store' });
       if (!resp.ok) return;
       const d = await resp.json();
       if (!serverLocaleAttivo) {
