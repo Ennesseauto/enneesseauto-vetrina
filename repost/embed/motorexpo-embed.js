@@ -997,7 +997,6 @@
   }
 
   async function sincronizzaConDashboardLocale() {
-    if (SOLO_DA_GITHUB) return;
     try {
       const resp = await fetch(`${API_ORIGIN}/api/stato`, { cache: 'no-store' });
       if (!resp.ok) return;
@@ -1011,7 +1010,14 @@
     }
   }
 
-  window.__EES_MOTOREXPO_REFRESH__ = disegnaTutto;
+  window.__EES_MOTOREXPO_REFRESH__ = function () {
+    if (annunciTutti.length) {
+      disegnaTutto();
+    } else {
+      sincronizzaConCloud(true);
+      sincronizzaConDashboardLocale();
+    }
+  };
 
   if (annunciTutti.length) {
     ultimaImpronta = calcolaImpronta(annunciTutti, ordineSito);
@@ -1022,6 +1028,12 @@
 
   // Se la Dashboard locale è attiva sul PC, aggiorna ogni 2 secondi; altrimenti controlla il Cloud H24 ogni 30 secondi
   window.__EES_TIMER__ = setInterval(() => {
+    if (annunci.length) {
+      const blocchi = $$('#ees-home-salone, [data-ees-blocco="salone"], #ees-catalogo-completo, [data-ees-blocco="catalogo"]');
+      if (blocchi.some(el => !el.children.length)) {
+        disegnaTutto();
+      }
+    }
     if (serverLocaleAttivo) {
       sincronizzaConDashboardLocale();
     } else {

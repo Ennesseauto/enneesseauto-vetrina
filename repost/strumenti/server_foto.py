@@ -21,7 +21,10 @@ import re
 import socket
 import subprocess
 import sys
+import threading
+import time
 import urllib.parse
+import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -384,7 +387,41 @@ class GestoreLocale(BaseHTTPRequestHandler):
             self.invia_json(200, stato)
             return
 
+        if percorso == "/api/spegnimento" and self.client_address[0] == "127.0.0.1":
+            self.invia_json(200, {"ok": True})
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
+
         self.invia_json(404, {"ok": False, "errore": "Endpoint sconosciuto"})
+
+
+def libera_porta_se_occupata(porta: int):
+    try:
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{porta}/api/spegnimento",
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=2)
+        time.sleep(0.5)
+    except Exception:
+        pass
+    if sys.platform.startswith("win"):
+        try:
+            subprocess.run(
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-Command",
+                    f"Get-NetTCPConnection -LocalPort {porta} -State Listen -ErrorAction SilentlyContinue | ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }}",
+                ],
+                capture_output=True,
+                timeout=5,
+            )
+            time.sleep(0.4)
+        except Exception:
+            pass
 
 
 def main():
@@ -394,13 +431,17 @@ def main():
     bind_host = "0.0.0.0" if rete_locale else HOST
     ip_lan = rileva_ip_lan()
     print("=================================================================")
-    print("  REPOST AUTOSCOUT24 — Dashboard Locale & Cloud H24")
+    print("  ENNE ESSE AUTO · MOTOREXPO BRESCIA — Dashboard Parco Auto")
     print("=================================================================")
     esegui_pull_iniziale()
     stato_completo()
     url_pc = f"http://127.0.0.1:{porta}/repost/gestione-foto.html"
     url_lan = f"http://{ip_lan}:{porta}/gestione-foto.html"
-    server = ThreadingHTTPServer((bind_host, porta), GestoreLocale)
+    try:
+        server = ThreadingHTTPServer((bind_host, porta), GestoreLocale)
+    except OSError:
+        libera_porta_se_occupata(porta)
+        server = ThreadingHTTPServer((bind_host, porta), GestoreLocale)
     print(f"\n  • Su questo PC:                      {url_pc}")
     if rete_locale and ip_lan != "127.0.0.1":
         print(f"  • Altri PC / Telefoni Wi-Fi ufficio: {url_lan}")
