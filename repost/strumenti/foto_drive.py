@@ -93,11 +93,11 @@ def carica_stato_manuale() -> dict:
     - copertine: {id_auto: url_o_percorso_foto_copertina}
     - foto_originali_as24: {id_auto: [lista_url_as24]}
     """
-    base = {"stati": {}, "copertine": {}, "foto_originali_as24": {}, "ordine_sito": "autoscout"}
+    base = {"stati": {}, "copertine": {}, "foto_originali_as24": {}, "homepage": {}, "ordine_sito": "autoscout"}
     if FILE_STATO_MANUALE.exists():
         try:
             letto = json.loads(FILE_STATO_MANUALE.read_text(encoding="utf-8"))
-            for k in ("stati", "copertine", "foto_originali_as24"):
+            for k in ("stati", "copertine", "foto_originali_as24", "homepage"):
                 if isinstance(letto.get(k), dict):
                     base[k].update(letto[k])
             if isinstance(letto.get("ordine_sito"), str) and letto["ordine_sito"]:
@@ -537,6 +537,7 @@ def sincronizza_cartella_drive(annunci: list, dir_drive: Path = None) -> dict:
     stati_salvati = stato_man["stati"]
     copertine_salvate = stato_man["copertine"]
     foto_orig_salvate = stato_man["foto_originali_as24"]
+    homepage_salvate = stato_man["homepage"]
 
     rif_attivi = set()
     conteggi_extra = {}
@@ -589,6 +590,7 @@ def sincronizza_cartella_drive(annunci: list, dir_drive: Path = None) -> dict:
         cartella_auto = sposta_cartella_stato(cartella_auto, stato_auto, a, n_as24, n_extra, dir_drive)
 
         a["stato"] = stato_auto
+        a["homepage"] = bool(homepage_salvate.get(id_auto, False))
         a["foto"] = lista_foto
         a["fotoAs24"] = n_as24
         a["fotoExtra"] = n_extra

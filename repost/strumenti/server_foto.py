@@ -273,6 +273,21 @@ class GestoreLocale(BaseHTTPRequestHandler):
             self.invia_json(200, stato)
             return
 
+        # 3a. Attiva/disattiva la presenza dell'auto nel carosello "Homepage"
+        if percorso == "/api/cambia-homepage":
+            id_auto = body.get("id")
+            in_homepage = bool(body.get("homepage"))
+            if not id_auto:
+                self.invia_json(400, {"ok": False, "errore": "ID auto mancante"})
+                return
+            stato_man = carica_stato_manuale()
+            stato_man.setdefault("homepage", {})[id_auto] = in_homepage
+            salva_stato_manuale(stato_man)
+            stato = stato_completo()
+            pianifica_push_background(f"Homepage auto {id_auto[:8]} -> {'SI' if in_homepage else 'NO'}")
+            self.invia_json(200, stato)
+            return
+
         # 3b. Imposta l'ordine predefinito del sito deciso dalla Dashboard
         if percorso == "/api/imposta-ordine":
             nuovo_ordine = body.get("ordine") or "autoscout"

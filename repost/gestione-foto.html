@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cruscotto Gestione Salone & Foto · Repost AutoScout24</title>
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0a0b0d">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0e10'/%3E%3Cpath d='M8.93 23.07A10 10 0 1 1 23.07 23.07' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M16 16 21.5 10.5' stroke='%23e0102b' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('paddock-tema-dash');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/repost.css">
+  <style>
+    /* ---------- Stile Cruscotto Scuro Repost / Paddock ---------- */
+    .db-hero { padding: 36px 0 24px; border-bottom: 1px solid var(--line); }
+    .db-hero__grid { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .db-hero h1 { margin: 6px 0 8px; font-size: clamp(28px, 3.8vw, 44px); letter-spacing: -.02em; }
+    .db-hero__sub { margin: 0; color: var(--text-2); font-size: 15px; max-width: 62ch; }
+    .db-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    /* KPI Cards */
+    .db-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 24px 0 28px; }
+    @media (max-width: 1050px) { .db-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+    .db-kpi {
+      position: relative; padding: 18px 20px; border-radius: var(--radius);
+      border: 1px solid var(--line); background: var(--surface);
+      display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+      transition: border-color .2s, transform .2s, box-shadow .2s; text-align: left; color: inherit;
+    }
+    .db-kpi:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .db-kpi.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .db-kpi__top { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); }
+    .db-kpi__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-3); }
+    .db-kpi--salone .db-kpi__dot { background: var(--good); box-shadow: 0 0 10px var(--good); }
+    .db-kpi--home .db-kpi__dot { background: #f36e21; box-shadow: 0 0 10px #f36e21; }
+    .db-kpi--arrivo .db-kpi__dot { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+    .db-kpi--foto .db-kpi__dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .db-kpi__val { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; margin-top: 4px; }
+    .db-kpi__desc { font-size: 12.5px; color: var(--text-2); }
+
+    /* Sezione In Arrivo ad alto impatto */
+    .db-spotlight {
+      margin: 0 0 32px; padding: 22px 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid color-mix(in srgb, var(--warn) 42%, var(--line));
+      background: linear-gradient(145deg, color-mix(in srgb, var(--warn) 9%, var(--surface)), var(--surface));
+    }
+    .db-spotlight__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .db-spotlight__title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 20px; font-family: var(--font-display); }
+    .db-spotlight__hint { font-size: 13px; color: var(--text-2); margin: 0; }
+
+    /* Barra filtri e ricerca */
+    .db-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .db-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Griglia auto della Dashboard */
+    .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr)); gap: 18px; margin-bottom: 48px; }
+    .db-card {
+      display: flex; flex-direction: column;
+      border: 1px solid var(--line); border-radius: var(--radius-lg);
+      background: var(--surface); overflow: hidden;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .db-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+    .db-card.is-arrivo { border-color: color-mix(in srgb, var(--warn) 50%, var(--line)); }
+    .db-card.is-venduta { opacity: .68; filter: grayscale(.35); }
+    .db-card__media { position: relative; aspect-ratio: 16 / 10; background: var(--surface-2); overflow: hidden; cursor: pointer; }
+    .db-card__media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+    .db-card__media:hover img { transform: scale(1.03); }
+    .db-card__top { position: absolute; left: 10px; right: 10px; top: 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; pointer-events: none; }
+    .db-card__bottom { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 6px; pointer-events: none; }
+
+    .db-tag { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .db-tag--salone { background: color-mix(in srgb, var(--good) 20%, #0a0b0d); color: var(--good); border: 1px solid color-mix(in srgb, var(--good) 45%, transparent); }
+    .db-tag--home { background: #f36e21; color: #fff; box-shadow: 0 2px 10px rgba(243, 110, 33, .45); }
+    .db-tag--arrivo { background: var(--warn); color: #0a0b0d; }
+    .db-tag--venduta { background: var(--accent); color: #fff; }
+    .db-tag--warn { background: rgba(10, 11, 13, .82); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 50%, transparent); }
+    .db-tag--ok { background: rgba(10, 11, 13, .82); color: var(--good); }
+
+    .db-card__body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .db-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .db-card__make { font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); margin: 0 0 2px; }
+    .db-card__title { font-family: var(--font-display); font-size: 19px; font-weight: 650; margin: 0; line-height: 1.15; }
+    .db-card__price { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text); white-space: nowrap; }
+    .db-card__meta { font-size: 12.5px; color: var(--text-2); margin: 0; }
+
+    /* Barra progresso foto 0..50 */
+    .db-prog { display: flex; flex-direction: column; gap: 5px; }
+    .db-prog__bar { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+    .db-prog__fill { height: 100%; border-radius: 999px; background: var(--good); transition: width .3s; }
+    .db-prog__fill.is-low { background: var(--warn); }
+    .db-prog__lbl { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+    /* Selettore Stato a 3 pulsanti sulla card */
+    .db-state-switch {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line);
+    }
+    .db-state-btn {
+      height: 30px; border: 0; border-radius: 7px; background: transparent;
+      color: var(--text-2); font-size: 11.5px; font-weight: 600; cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .db-state-btn:hover { color: var(--text); }
+    .db-state-btn.is-active[data-stato="salone"] { background: var(--good); color: #0a0b0d; font-weight: 700; }
+    .db-state-btn.is-active[data-stato="arrivo"] { background: var(--warn); color: #0a0b0d; font-weight: 700; }
+    .db-state-btn.is-active[data-stato="venduta"] { background: var(--accent); color: #fff; font-weight: 700; }
+
+    /* Pulsante Selezione Homepage */
+    .db-btn-home {
+      width: 100%; height: 34px; border-radius: 10px;
+      border: 1px dashed color-mix(in srgb, #f36e21 55%, var(--line-strong));
+      background: color-mix(in srgb, #f36e21 7%, var(--surface-2));
+      color: var(--text-2); font-size: 12px; font-weight: 650;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer; transition: all .18s;
+    }
+    .db-btn-home:hover {
+      border-style: solid; border-color: #f36e21; color: var(--text);
+      background: color-mix(in srgb, #f36e21 16%, var(--surface-2));
+    }
+    .db-btn-home.is-active {
+      border-style: solid; border-color: #f36e21;
+      background: #f36e21; color: #fff; font-weight: 700;
+      box-shadow: 0 3px 12px rgba(243, 110, 33, .32);
+    }
+
+    .db-card__actions { display: flex; gap: 8px; margin-top: auto; padding-top: 6px; }
+    .db-btn-manage {
+      flex: 1; height: 36px; border-radius: 10px; border: 1px solid var(--line-strong);
+      background: var(--surface-2); color: var(--text); font-size: 12.5px; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .db-btn-manage:hover { border-color: var(--text); background: var(--raised); }
+    .db-btn-as24 {
+      height: 36px; padding: 0 12px; border-radius: 10px;
+      border: 1px solid color-mix(in srgb, var(--info) 40%, var(--line-strong));
+      background: color-mix(in srgb, var(--info) 10%, var(--surface-2));
+      color: var(--text); font-size: 12px; font-weight: 650; white-space: nowrap;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      transition: border-color .2s, background .2s, color .2s;
+    }
+    .db-btn-as24:hover { border-color: var(--info); background: color-mix(in srgb, var(--info) 22%, var(--surface-2)); }
+    .db-search-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; width: 100%; margin-bottom: 12px; }
+    .db-search-row .vt-sort select { height: 42px; font-size: 13px; }
+
+    /* ---------- Pannello / Modale Dettaglio Foto & Copertina ---------- */
+    .db-drawer {
+      width: min(1080px, 94vw); max-height: 90vh; padding: 0;
+      border: 1px solid var(--line-strong); border-radius: var(--radius-lg);
+      background: var(--bg); color: var(--text); box-shadow: var(--shadow-lg);
+    }
+    .db-drawer::backdrop { background: rgba(5, 6, 8, .76); backdrop-filter: blur(6px); }
+    .db-drawer__head {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 18px 24px; background: var(--surface); border-bottom: 1px solid var(--line);
+    }
+    .db-drawer__body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 80px); }
+
+    .db-dropzone {
+      border: 2px dashed color-mix(in srgb, var(--accent) 65%, var(--line-strong));
+      border-radius: var(--radius-lg); padding: 28px 20px; text-align: center;
+      background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+      cursor: pointer; transition: background .2s, border-color .2s; margin-bottom: 24px;
+    }
+    .db-dropzone:hover, .db-dropzone.is-dragover {
+      background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+      border-color: var(--accent);
+    }
+    .db-dropzone h3 { margin: 0 0 6px; font-size: 18px; }
+    .db-dropzone p { margin: 0 auto 14px; max-width: 58ch; font-size: 13.5px; color: var(--text-2); }
+
+    .db-photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; }
+    .db-photo {
+      position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden;
+      border: 2px solid var(--line); background: var(--surface-2); group: photo;
+    }
+    .db-photo.is-cover { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .db-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .db-photo__badge {
+      position: absolute; left: 8px; top: 8px; padding: 3px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; background: rgba(10, 11, 13, .78); color: #fff;
+      backdrop-filter: blur(4px);
+    }
+    .db-photo__badge--cover { background: var(--accent); color: #fff; }
+    .db-photo__badge--extra { background: var(--good); color: #0a0b0d; }
+    .db-photo__bar {
+      position: absolute; inset: auto 0 0 0; padding: 8px;
+      background: linear-gradient(transparent, rgba(5, 6, 8, .9));
+      display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    }
+    .db-photo-btn {
+      padding: 4px 9px; border-radius: 7px; border: 1px solid rgba(255,255,255,.22);
+      background: rgba(18, 19, 22, .88); color: #fff; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: background .15s, border-color .15s;
+    }
+    .db-photo-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .db-photo-btn--del { background: rgba(224, 16, 43, .85); border-color: transparent; }
+
+    .db-toast {
+      position: fixed; right: 20px; bottom: 20px; z-index: 200;
+      padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line-strong);
+      background: var(--surface); color: var(--text); font-size: 13.5px; font-weight: 600;
+      box-shadow: var(--shadow-lg);
+    }
+    .db-log {
+      margin: 0 0 24px; padding: 14px 18px; border-radius: var(--radius);
+      border: 1px solid var(--line-strong); background: var(--surface);
+      font-family: var(--mono); font-size: 12px; color: var(--text-2);
+      max-height: 200px; overflow-y: auto; white-space: pre-wrap;
+    }
+
+    /* ---------- Ottimizzazione Mobile & Tablet ---------- */
+    .db-drawer__actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .db-gallery-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 12px; }
+    @media (max-width: 768px) {
+      .db-hero { padding: 22px 0 18px; }
+      .db-hero__sub { font-size: 13.5px; }
+      .db-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 8px; }
+      .db-actions #btn-sync-as24 { grid-column: 1 / -1; height: 42px; font-size: 13.5px; justify-content: center; }
+      .db-actions .btn { width: 100%; justify-content: center; padding-inline: 10px; }
+      .db-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 18px 0 22px; }
+      .db-kpi { padding: 13px 14px; }
+      .db-kpi__top { font-size: 10px; letter-spacing: .1em; }
+      .db-kpi__val { font-size: 26px; }
+      .db-kpi__desc { font-size: 11.5px; line-height: 1.25; }
+      .db-spotlight { padding: 16px 14px; margin-bottom: 24px; }
+      .db-search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .db-search-row .vt-search { grid-column: 1 / -1; min-width: 0 !important; width: 100%; }
+      .db-search-row .vt-sort { display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 100%; }
+      .db-search-row .vt-sort:last-child { grid-column: 1 / -1; }
+      .db-search-row .vt-sort span { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; padding-left: 4px; }
+      .db-search-row .vt-sort select { width: 100%; height: 40px; border-radius: 12px; }
+      .db-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; padding-bottom: 6px; scrollbar-width: none; }
+      .db-tabs::-webkit-scrollbar { display: none; }
+      .db-grid { grid-template-columns: 1fr; gap: 14px; }
+      .db-state-btn { height: 36px; font-size: 12px; }
+      .db-btn-manage, .db-btn-as24 { height: 40px; font-size: 12.5px; }
+      .db-drawer {
+        width: 100vw; max-width: 100vw; height: 94dvh; max-height: 94dvh;
+        margin: auto 0 0 0; border-radius: 18px 18px 0 0; border-bottom: 0;
+      }
+      .db-drawer__head { padding: 14px 16px; gap: 10px; }
+      .db-drawer__actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+      .db-drawer__actions .btn { width: 100%; justify-content: center; height: 36px; font-size: 12px; padding-inline: 8px; }
+      .db-drawer__body { padding: 14px 16px 28px; max-height: calc(94dvh - 125px); }
+      .db-dropzone { padding: 18px 14px; margin-bottom: 18px; }
+      .db-dropzone h3 { font-size: 15.5px; }
+      .db-dropzone p { font-size: 12.5px; margin-bottom: 10px; }
+      .db-photos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .db-photo-btn { padding: 6px 9px; font-size: 11px; }
+      .db-toast { left: 14px; right: 14px; bottom: 14px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#contenuto">Vai al contenuto</a>
+
+  <!-- ============ BARRA SUPERIORE DASHBOARD ENNE ESSE AUTO ============ -->
+  <div class="proto">
+    <div class="container proto__inner">
+      <span class="proto__name" style="font-weight:700;color:var(--text)">Enne Esse Auto · Motorexpo Brescia — Dashboard Parco Auto</span>
+      <nav class="proto__switch" aria-label="Collegamenti rapidi">
+        <a href="https://www.enneesseauto.it" target="_blank" rel="noopener">🌐 Apri Sito Ufficiale<span class="proto__long"> (enneesseauto.it) ↗</span></a>
+      </nav>
+      <span class="proto__data" id="db-data"></span>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Cambia tema">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span class="theme-toggle__label">Scuro</span>
+      </button>
+    </div>
+  </div>
+
+  <main id="contenuto" class="container">
+    <!-- ============ INTESTAZIONE & PULSANTI OPERATIVI ============ -->
+    <header class="db-hero">
+      <div class="db-hero__grid">
+        <div>
+          <p class="overline overline--accent"><span class="pulse" aria-hidden="true"></span>Controllo Parco Auto · Enne Esse Auto</p>
+          <h1>Salone, Arrivi & Foto</h1>
+          <p class="db-hero__sub">Gestisci quali auto sono in salone, in arrivo o vendute, scegli le immagini di copertina e integra le 40 foto bloccate da AutoScout24.</p>
+        </div>
+        <div class="db-actions">
+          <button class="btn btn--ghost btn--small" id="btn-apri-drive" type="button">📂 Cartella Foto PC</button>
+          <button class="btn btn--ghost btn--small" id="btn-sync-drive" type="button">⚡ Rileggi Cartella Foto</button>
+          <button class="btn btn--primary btn--small" id="btn-sync-as24" type="button">🔄 Aggiorna ora da AutoScout24</button>
+        </div>
+      </div>
+    </header>
+
+    <pre class="db-log is-hidden" id="db-log"></pre>
+
+    <!-- ============ 5 INDICATORI AD IMPATTO (KPI) ============ -->
+    <section class="db-kpis" aria-label="Riepilogo parco auto">
+      <button class="db-kpi db-kpi--salone is-active" type="button" data-filtro="tutti">
+        <span class="db-kpi__top"><span>In Salone (Pronte)</span><span class="db-kpi__dot"></span></span>
+        <strong class="db-kpi__val" id="kpi-salone">0</strong>
+        <span class="db-kpi__desc">Visibili nella pagina Autovetture</span>
+      </button>
+      <button class="db-kpi db-kpi--home" type="button" data-filtro="homepage">
+        <span class="db-kpi__top"><span>★ In Homepage</span><span class="db-kpi__dot"></span></span>
+        <strong class="db-kpi__val" id="kpi-homepage">0</strong>
+        <span class="db-kpi__desc">Selezionate per il carosello Home</span>
+      </button>
+      <button class="db-kpi db-kpi--arrivo" type="button" data-filtro="arrivo">
+        <span class="db-kpi__top"><span>Vetture in Arrivo</span><span class="db-kpi__dot"></span></span>
+        <strong class="db-kpi__val" id="kpi-arrivo">0</strong>
+        <span class="db-kpi__desc">In evidenza nella sezione "In arrivo"</span>
+      </button>
+      <button class="db-kpi db-kpi--foto" type="button" data-filtro="mancanti">
+        <span class="db-kpi__top"><span>Foto da completare</span><span class="db-kpi__dot"></span></span>
+        <strong class="db-kpi__val" id="kpi-mancanti">0</strong>
+        <span class="db-kpi__desc">Bloccate a 5–15 foto su AutoScout24</span>
+      </button>
+      <button class="db-kpi" type="button" data-filtro="venduta">
+        <span class="db-kpi__top"><span>Vendute (Nascoste)</span><span class="db-kpi__dot"></span></span>
+        <strong class="db-kpi__val" id="kpi-vendute">0</strong>
+        <span class="db-kpi__desc">Tolte dal sito e spostate in archivio</span>
+      </button>
+    </section>
+
+    <!-- ============ PRIMA VISTA AD IMPATTO: VETTURE IN ARRIVO ============ -->
+    <section class="db-spotlight is-hidden" id="db-sezione-arrivo" aria-labelledby="db-titolo-arrivo">
+      <div class="db-spotlight__head">
+        <div>
+          <p class="overline overline--accent" style="margin-bottom:4px">Vetrina dedicata sul sito</p>
+          <h2 class="db-spotlight__title" id="db-titolo-arrivo">Vetture in Arrivo selezionate</h2>
+        </div>
+        <p class="db-spotlight__hint">Clicca su <strong>"In Salone"</strong> quando l'auto arriva fisicamente in concessionaria.</p>
+      </div>
+      <div class="db-grid" id="db-grid-arrivo" style="margin-bottom:0"></div>
+    </section>
+
+    <!-- ============ BARRA DI RICERCA E FILTRI SALONE ============ -->
+    <div class="db-toolbar">
+      <div class="db-search-row">
+        <label class="vt-search" style="min-width:240px;flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="db-cerca" type="search" placeholder="Cerca marca, modello, allestimento, rif…" autocomplete="off" style="height:42px">
+        </label>
+        <label class="vt-sort">
+          <span>Stato</span>
+          <select id="db-select-stato">
+            <option value="tutti">Tutte attive</option>
+            <option value="homepage">★ Selezionate per Homepage</option>
+            <option value="salone">Solo in Salone</option>
+            <option value="arrivo">Vetture in Arrivo</option>
+            <option value="mancanti">Da completare (&lt;30 foto)</option>
+            <option value="complete">Già complete (50 foto)</option>
+            <option value="venduta">Vendute (Archivio)</option>
+          </select>
+        </label>
+        <label class="vt-sort">
+          <span>Categoria</span>
+          <select id="db-select-categoria">
+            <option value="">Tutte le categorie</option>
+          </select>
+        </label>
+        <label class="vt-sort">
+          <span>Marchio</span>
+          <select id="db-select-marca">
+            <option value="">Tutti i marchi</option>
+          </select>
+        </label>
+        <label class="vt-sort">
+          <span>Ordina</span>
+          <select id="db-select-ordine">
+            <option value="autoscout">AutoScout24</option>
+            <option value="default">Default</option>
+            <option value="recenti">Ultimi caricati</option>
+            <option value="prezzoSu">Prezzo più basso</option>
+            <option value="prezzoGiu">Prezzo più alto</option>
+            <option value="menoFoto">Meno foto (da completare)</option>
+          </select>
+        </label>
+      </div>
+      <div class="db-tabs" id="db-chips" role="group" aria-label="Filtra per stato">
+        <button class="vt-chip" type="button" data-filtro="tutti" aria-pressed="true">Tutte attive <span class="vt-chip__n" id="chip-tutti">0</span></button>
+        <button class="vt-chip" type="button" data-filtro="homepage" aria-pressed="false">★ In Homepage <span class="vt-chip__n" id="chip-homepage">0</span></button>
+        <button class="vt-chip" type="button" data-filtro="salone" aria-pressed="false">Solo in Salone <span class="vt-chip__n" id="chip-salone">0</span></button>
+        <button class="vt-chip" type="button" data-filtro="arrivo" aria-pressed="false">In Arrivo <span class="vt-chip__n" id="chip-arrivo">0</span></button>
+        <button class="vt-chip" type="button" data-filtro="mancanti" aria-pressed="false">Con poche foto (da completare) <span class="vt-chip__n" id="chip-mancanti">0</span></button>
+        <button class="vt-chip" type="button" data-filtro="venduta" aria-pressed="false">Vendute <span class="vt-chip__n" id="chip-venduta">0</span></button>
+      </div>
+    </div>
+
+    <div class="db-grid" id="db-grid"></div>
+  </main>
+
+  <!-- ============ MODALE GESTIONE FOTO & COPERTINA ============ -->
+  <dialog class="db-drawer" id="db-modal" aria-label="Gestione foto e copertina dell'auto">
+    <div class="db-drawer__head">
+      <div>
+        <p class="overline overline--accent" id="mod-sotto" style="margin:0"></p>
+        <h2 id="mod-titolo" style="margin:2px 0 0;font-size:22px"></h2>
+      </div>
+      <div class="db-drawer__actions">
+        <a class="btn btn--ghost btn--small" id="mod-link-as24" href="#" target="_blank" rel="noopener">AutoScout24 ↗</a>
+        <button class="btn btn--ghost btn--small" id="mod-apri-cartella" type="button">📂 Cartella auto</button>
+        <button class="btn btn--ghost btn--small" id="mod-svuota-extra" type="button">Rimuovi extra</button>
+        <button class="btn btn--primary btn--small" id="mod-chiudi" type="button">Chiudi ✕</button>
+      </div>
+    </div>
+    <div class="db-drawer__body">
+      <div class="db-dropzone" id="mod-dropzone">
+        <input type="file" id="mod-file-input" multiple accept="image/*" hidden>
+        <h3>Trascina o scegli le foto integrative (anche tutte le 50 insieme!)</h3>
+        <p id="mod-drop-testo">Da PC o smartphone: seleziona tutte le foto dell'auto. Il sistema scarta da solo i doppioni già presenti su AutoScout24 e converte le foto mancanti in WebP.</p>
+        <button class="btn btn--primary btn--small" type="button">Scegli foto da PC o Telefono</button>
+      </div>
+
+      <div class="db-gallery-head">
+        <h3 id="mod-conta-foto" style="margin:0;font-size:16px">Galleria foto</h3>
+        <span style="font-size:12.5px;color:var(--text-2)">Tocca <strong>"★ Imposta Copertina"</strong> su qualsiasi foto per metterla al 1° posto sul sito</span>
+      </div>
+      <div class="db-photos-grid" id="mod-griglia-foto"></div>
+    </div>
+  </dialog>
+
+  <div class="db-toast is-hidden" id="db-toast" role="status"></div>
+
+  <script src="dati/annunci.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const CDN_FOTO = 'https://prod.pictures.autoscout24.net/';
+      const RE_EXTRA = /^foto-extra\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/;
+      const $ = (s, c = document) => c.querySelector(s);
+      const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+      const euro = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+      const API_BASE = location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8765';
+      const canaleLive = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('repost_live') : null;
+      function notificaSitoLive() {
+        try { if (canaleLive) canaleLive.postMessage({ ts: Date.now() }); } catch (e) {}
+        try { localStorage.setItem('repost_live_ts', String(Date.now())); } catch (e) {}
+      }
+      let serverAttivo = true;
+      let annunci = (window.REPOST_DATI && window.REPOST_DATI.annunci) || [];
+      let filtroStato = 'tutti';
+      let filtroCategoria = '';
+      let filtroMarca = '';
+      let filtroOrdine = 'autoscout';
+      let cercaTesto = '';
+      let idModale = null;
+
+      function esc(v) {
+        return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      function urlFoto(base, misura = '720x540') {
+        if (typeof base !== 'string') return '';
+        if (base.startsWith(CDN_FOTO)) return `${base}/${misura}.webp`;
+        if (RE_EXTRA.test(base)) return `dati/${base}/${misura}.webp`;
+        return '';
+      }
+
+      function toast(msg) {
+        const el = $('#db-toast');
+        el.textContent = msg;
+        el.classList.remove('is-hidden');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.add('is-hidden'), 3600);
+      }
+
+      /* ---------- Tema Chiaro / Scuro ---------- */
+      function aggiornaTemaUI() {
+        const scuro = document.documentElement.getAttribute('data-theme') !== 'light';
+        const btn = $('#theme-toggle');
+        $('.icon-sun', btn).classList.toggle('is-hidden', scuro);
+        $('.icon-moon', btn).classList.toggle('is-hidden', !scuro);
+        $('.theme-toggle__label', btn).textContent = scuro ? 'Scuro' : 'Chiaro';
+      }
+      $('#theme-toggle').addEventListener('click', () => {
+        const scuro = document.documentElement.getAttribute('data-theme') !== 'light';
+        const nuovo = scuro ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nuovo);
+        try { localStorage.setItem('paddock-tema-dash', nuovo); } catch (e) {}
+        aggiornaTemaUI();
+      });
+      aggiornaTemaUI();
+
+      /* ---------- Caricamento stato dal server ---------- */
+      async function caricaStato() {
+        try {
+          const r = await fetch(API_BASE + '/api/stato');
+          const d = await r.json();
+          if (d && d.ok) {
+            serverAttivo = true;
+            annunci = d.annunci || [];
+            if (d.ordineSito) {
+              filtroOrdine = d.ordineSito;
+              if ($('#db-select-ordine')) $('#db-select-ordine').value = filtroOrdine;
+            }
+            if (d.aggiornato) {
+              const dt = new Date(d.aggiornato);
+              const strDt = dt.toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+              const badgeCloud = d.cloudAttivo ? ' · ☁️ Cloud H24 Attivo' : '';
+              $('#db-data').textContent = (d.urlReteLocale ? `Aggiornato ${strDt} · 📱 Wi-Fi: ${d.urlReteLocale.replace('/gestione-foto.html', '')}` : `Aggiornato ${strDt}`) + badgeCloud;
+            }
+          }
+        } catch (e) {}
+        disegnaTutto();
+      }
+
+      function cardHTML(a) {
+        const stato = a.stato || 'salone';
+        const inHomepage = Boolean(a.homepage) && stato === 'salone';
+        const nTot = (a.foto || []).length;
+        const nExtra = a.fotoExtra || (a.foto || []).filter(f => f.startsWith('foto-extra/')).length;
+        const nAs24 = a.fotoAs24 || (nTot - nExtra);
+        const perc = Math.min(100, Math.round((nTot / 50) * 100));
+        const pocheFoto = nTot < 30;
+        const rif = a.id.slice(0, 8);
+        const copertina = urlFoto((a.foto || [])[0], '720x540');
+
+        const etichettaStato = stato === 'arrivo'
+          ? '<span class="db-tag db-tag--arrivo">In Arrivo</span>'
+          : (stato === 'venduta'
+            ? '<span class="db-tag db-tag--venduta">Venduta</span>'
+            : `<span class="db-tag db-tag--salone">In Salone</span>${inHomepage ? ' <span class="db-tag db-tag--home">★ Homepage</span>' : ''}`);
+
+        const etichettaFoto = pocheFoto
+          ? `<span class="db-tag db-tag--warn">⚠ ${nTot}/50 foto (Bloccata AS24)</span>`
+          : `<span class="db-tag db-tag--ok">✓ ${nTot} foto${nExtra ? ` (+${nExtra} extra)` : ''}</span>`;
+
+        return `
+          <article class="db-card ${stato === 'arrivo' ? 'is-arrivo' : ''} ${stato === 'venduta' ? 'is-venduta' : ''}" data-card-id="${esc(a.id)}">
+            <div class="db-card__media" data-apri-foto="${esc(a.id)}" title="Clicca per gestire foto e copertina">
+              ${copertina ? `<img src="${esc(copertina)}" alt="" loading="lazy">` : ''}
+              <div class="db-card__top">
+                <div style="display:flex;gap:5px;flex-wrap:wrap">${etichettaStato}</div>
+                <span class="vt-pill">rif. ${esc(rif)}</span>
+              </div>
+              <div class="db-card__bottom">
+                ${etichettaFoto}
+              </div>
+            </div>
+            <div class="db-card__body">
+              <div class="db-card__head">
+                <div>
+                  <p class="db-card__make">${esc(a.marca)}</p>
+                  <h3 class="db-card__title">${esc(a.modello)}</h3>
+                </div>
+                <span class="db-card__price">${a.prezzo ? esc(euro.format(a.prezzo)) : 'Su rich.'}</span>
+              </div>
+              <p class="db-card__meta">${esc((a.immatricolazione || '').slice(0, 4))} · ${a.km ? esc(a.km.toLocaleString('it-IT') + ' km') : ''} · ${esc(a.carburante || '')}</p>
+
+              <div class="db-prog">
+                <div class="db-prog__bar"><div class="db-prog__fill ${pocheFoto ? 'is-low' : ''}" style="width:${perc}%"></div></div>
+                <div class="db-prog__lbl">
+                  <span>AutoScout24: ${nAs24} foto</span>
+                  <span>Extra Drive: +${nExtra}</span>
+                </div>
+              </div>
+
+              <div class="db-state-switch" role="group" aria-label="Stato dell'auto">
+                <button class="db-state-btn ${stato === 'salone' ? 'is-active' : ''}" type="button" data-cambia-stato="${esc(a.id)}" data-stato="salone">In Salone</button>
+                <button class="db-state-btn ${stato === 'arrivo' ? 'is-active' : ''}" type="button" data-cambia-stato="${esc(a.id)}" data-stato="arrivo">In Arrivo</button>
+                <button class="db-state-btn ${stato === 'venduta' ? 'is-active' : ''}" type="button" data-cambia-stato="${esc(a.id)}" data-stato="venduta">Venduta</button>
+              </div>
+
+              ${stato === 'salone' ? `
+              <button class="db-btn-home ${inHomepage ? 'is-active' : ''}" type="button" data-cambia-home="${esc(a.id)}" data-home-val="${inHomepage ? '0' : '1'}">
+                ${inHomepage ? '★ In Homepage (Visibile nel carosello Home)' : '☆ Mostra in Homepage'}
+              </button>` : ''}
+
+              <div class="db-card__actions">
+                <button class="db-btn-manage" type="button" data-apri-foto="${esc(a.id)}">
+                  📷 Foto & Copertina (${nTot})
+                </button>
+                ${a.url ? `<a class="db-btn-as24" href="${esc(a.url)}" target="_blank" rel="noopener" title="Apri annuncio su AutoScout24">AutoScout24 ↗</a>` : ''}
+              </div>
+            </div>
+          </article>`;
+      }
+
+      function disegnaTutto() {
+        const inSalone = annunci.filter(a => (a.stato || 'salone') === 'salone');
+        const inHomepage = inSalone.filter(a => Boolean(a.homepage));
+        const inArrivo = annunci.filter(a => a.stato === 'arrivo');
+        const vendute = annunci.filter(a => a.stato === 'venduta');
+        const mancanti = annunci.filter(a => a.stato !== 'venduta' && (a.foto || []).length < 30);
+        const complete = annunci.filter(a => a.stato !== 'venduta' && (a.foto || []).length >= 30);
+        const attive = annunci.filter(a => a.stato !== 'venduta');
+
+        // Popola i menu a tendina Categoria (Carrozzeria) e Marchio accanto alla barra di ricerca
+        const selCat = $('#db-select-categoria');
+        if (selCat) {
+          const catMap = new Map();
+          attive.forEach(a => { if (a.carrozzeria) catMap.set(a.carrozzeria, (catMap.get(a.carrozzeria) || 0) + 1); });
+          selCat.innerHTML = '<option value="">Tutte le categorie</option>' +
+            Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).map(([c, n]) => `<option value="${esc(c)}">${esc(c)} (${n})</option>`).join('');
+          selCat.value = filtroCategoria;
+        }
+        const selMarca = $('#db-select-marca');
+        if (selMarca) {
+          const marcaMap = new Map();
+          attive.forEach(a => { if (a.marca) marcaMap.set(a.marca, (marcaMap.get(a.marca) || 0) + 1); });
+          selMarca.innerHTML = '<option value="">Tutti i marchi</option>' +
+            Array.from(marcaMap.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([m, n]) => `<option value="${esc(m)}">${esc(m)} (${n})</option>`).join('');
+          selMarca.value = filtroMarca;
+        }
+        const selStato = $('#db-select-stato');
+        if (selStato) selStato.value = filtroStato;
+
+        $('#kpi-salone').textContent = inSalone.length;
+        if ($('#kpi-homepage')) $('#kpi-homepage').textContent = inHomepage.length;
+        $('#kpi-arrivo').textContent = inArrivo.length;
+        $('#kpi-mancanti').textContent = mancanti.length;
+        $('#kpi-vendute').textContent = vendute.length;
+
+        $('#chip-tutti').textContent = attive.length;
+        if ($('#chip-homepage')) $('#chip-homepage').textContent = inHomepage.length;
+        $('#chip-salone').textContent = inSalone.length;
+        $('#chip-arrivo').textContent = inArrivo.length;
+        $('#chip-mancanti').textContent = mancanti.length;
+        $('#chip-venduta').textContent = vendute.length;
+
+        // Sezione Spotlight "Vetture in Arrivo" (mostrata nella vista principale "tutti")
+        const boxArrivo = $('#db-sezione-arrivo');
+        if (inArrivo.length > 0 && filtroStato === 'tutti' && !filtroCategoria && !filtroMarca && !cercaTesto.trim()) {
+          $('#db-grid-arrivo').innerHTML = inArrivo.map(cardHTML).join('');
+          boxArrivo.classList.remove('is-hidden');
+        } else {
+          boxArrivo.classList.add('is-hidden');
+        }
+
+        let base = attive;
+        if (filtroStato === 'homepage') base = inHomepage;
+        else if (filtroStato === 'salone') base = inSalone;
+        else if (filtroStato === 'arrivo') base = inArrivo;
+        else if (filtroStato === 'mancanti') base = mancanti;
+        else if (filtroStato === 'complete') base = complete;
+        else if (filtroStato === 'venduta') base = vendute;
+
+        const q = cercaTesto.trim().toLowerCase();
+        const filtrati = base.filter(a => {
+          if (filtroCategoria && a.carrozzeria !== filtroCategoria) return false;
+          if (filtroMarca && a.marca !== filtroMarca) return false;
+          return `${a.marca} ${a.modello} ${a.versione} ${a.carrozzeria || ''} ${a.id}`.toLowerCase().includes(q);
+        });
+
+        filtrati.sort((a, b) => {
+          if (filtroOrdine === 'autoscout') return (a.ordineAs24 ?? 999) - (b.ordineAs24 ?? 999);
+          if (filtroOrdine === 'default') return (a.ordineDefault ?? a.ordineAs24 ?? 999) - (b.ordineDefault ?? b.ordineAs24 ?? 999);
+          if (filtroOrdine === 'recenti') return String(b.pubblicato || '').localeCompare(String(a.pubblicato || ''));
+          if (filtroOrdine === 'prezzoSu') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity);
+          if (filtroOrdine === 'prezzoGiu') return (b.prezzo ?? -1) - (a.prezzo ?? -1);
+          if (filtroOrdine === 'menoFoto') return (a.foto || []).length - (b.foto || []).length;
+          return 0;
+        });
+
+        $('#db-grid').innerHTML = filtrati.map(cardHTML).join('') || `
+          <div class="vt-empty" style="grid-column:1/-1">
+            <p class="vt-empty__title">Nessuna auto in questa vista</p>
+            <p>Cambia filtro o usa i pulsanti su ogni scheda per spostare un'auto in "In Arrivo" o "Venduta".</p>
+          </div>`;
+
+        if (idModale && $('#db-modal').open) {
+          disegnaModale(idModale);
+        }
+      }
+
+      /* ---------- Azioni Stato / Copertina / Upload ---------- */
+      async function cambiaStatoAuto(id, nuovoStato) {
+        try {
+          const r = await fetch(API_BASE + '/api/cambia-stato', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, stato: nuovoStato })
+          });
+          const d = await r.json();
+          if (d && d.ok) {
+            annunci = d.annunci || [];
+            disegnaTutto();
+            notificaSitoLive();
+            const et = nuovoStato === 'arrivo' ? 'Vetture in Arrivo' : (nuovoStato === 'venduta' ? 'Vendute (Archivio)' : 'In Salone');
+            toast(`✓ Stato aggiornato in tempo reale sul sito → ${et}`);
+          }
+        } catch (e) {
+          toast('Errore di connessione al server locale (127.0.0.1:8765).');
+        }
+      }
+
+      async function cambiaHomepageAuto(id, inHomepage) {
+        try {
+          const r = await fetch(API_BASE + '/api/cambia-homepage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, homepage: inHomepage })
+          });
+          const d = await r.json();
+          if (d && d.ok) {
+            annunci = d.annunci || [];
+            disegnaTutto();
+            notificaSitoLive();
+            toast(inHomepage ? '★ Auto aggiunta al carosello della Homepage!' : 'Auto rimossa dal carosello della Homepage (resta visibile in Autovetture).');
+          }
+        } catch (e) {
+          toast('Errore di connessione al server locale (127.0.0.1:8765).');
+        }
+      }
+
+      async function impostaCopertina(id, urlScelto) {
+        try {
+          const r = await fetch(API_BASE + '/api/imposta-copertina', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, foto: urlScelto })
+          });
+          const d = await r.json();
+          if (d && d.ok) {
+            annunci = d.annunci || [];
+            disegnaTutto();
+            notificaSitoLive();
+            toast('★ Nuova immagine di copertina attiva sul sito!');
+          }
+        } catch (e) {
+          toast('Errore salvataggio copertina.');
+        }
+      }
+
+      async function eliminaFotoExtra(id, urlExtra, tutte = false) {
+        const r = await fetch(API_BASE + '/api/elimina-foto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, urlExtra, tutte })
+        });
+        const d = await r.json();
+        if (d && d.ok) {
+          annunci = d.annunci || [];
+          disegnaTutto();
+          notificaSitoLive();
+          toast(tutte ? 'Tutte le foto extra rimosse dal sito.' : 'Foto extra rimossa dal sito.');
+        }
+      }
+
+      function leggiBase64(file) {
+        return new Promise((res, rej) => {
+          const fr = new FileReader();
+          fr.onload = () => res({ name: file.name, data: fr.result });
+          fr.onerror = rej;
+          fr.readAsDataURL(file);
+        });
+      }
+
+      async function caricaFotoDragDrop(id, fileList) {
+        const validi = Array.from(fileList || []).filter(f => f.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|bmp)$/i.test(f.name));
+        if (!validi.length) return;
+        if (!serverAttivo) {
+          toast('Avvia "Gestione foto.bat" per caricare le foto!');
+          return;
+        }
+        toast(`Analisi anti-doppioni e conversione WebP di ${validi.length} foto…`);
+        const files = await Promise.all(validi.map(leggiBase64));
+        const r = await fetch(API_BASE + '/api/carica-foto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, files })
+        });
+        const d = await r.json();
+        if (d && d.ok) {
+          annunci = d.annunci || [];
+          disegnaTutto();
+          notificaSitoLive();
+          const a = annunci.find(x => x.id === id);
+          toast(`Completato! Ora l'auto ha ${(a?.foto || []).length} foto sul sito (+${a?.fotoExtra || 0} extra).`);
+        }
+      }
+
+      /* ---------- Modale Foto & Copertina ---------- */
+      function disegnaModale(id) {
+        idModale = id;
+        const a = annunci.find(x => x.id === id);
+        if (!a) return;
+        const nTot = (a.foto || []).length;
+        const nExtra = a.fotoExtra || (a.foto || []).filter(f => f.startsWith('foto-extra/')).length;
+        const nAs24 = a.fotoAs24 || (nTot - nExtra);
+
+        $('#mod-sotto').textContent = `rif. ${a.id.slice(0, 8)} · ${nAs24} foto da AutoScout24 + ${nExtra} extra Drive`;
+        $('#mod-titolo').textContent = `${a.marca} ${a.modello} (${nTot} foto)`;
+        $('#mod-conta-foto').textContent = `Galleria sul sito (${nTot} foto)`;
+        $('#mod-svuota-extra').hidden = nExtra === 0;
+        const linkAs24 = $('#mod-link-as24');
+        if (linkAs24) {
+          linkAs24.href = a.url || '#';
+          linkAs24.hidden = !a.url;
+        }
+
+        $('#mod-griglia-foto').innerHTML = (a.foto || []).map((f, i) => {
+          const isExtra = f.startsWith('foto-extra/');
+          const isCover = i === 0;
+          return `
+            <div class="db-photo ${isCover ? 'is-cover' : ''}">
+              <img src="${esc(urlFoto(f, '250x188'))}" alt="Foto ${i + 1}" loading="lazy">
+              <span class="db-photo__badge ${isCover ? 'db-photo__badge--cover' : (isExtra ? 'db-photo__badge--extra' : '')}">
+                ${isCover ? '★ #1 Copertina' : `#${i + 1} · ${isExtra ? 'Extra' : 'AS24'}`}
+              </span>
+              <div class="db-photo__bar">
+                ${!isCover ? `<button class="db-photo-btn" type="button" data-set-cover="${esc(f)}">★ Imposta Copertina</button>` : `<span style="font-size:11px;color:#fff;font-weight:700">In copertina</span>`}
+                ${isExtra ? `<button class="db-photo-btn db-photo-btn--del" type="button" data-del-extra="${esc(f)}" title="Rimuovi questa foto extra">✕</button>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      function apriModale(id) {
+        disegnaModale(id);
+        const dlg = $('#db-modal');
+        if (!dlg.open) dlg.showModal();
+      }
+
+      /* ---------- Event Listeners ---------- */
+      document.addEventListener('click', e => {
+        const btnStato = e.target.closest('[data-cambia-stato]');
+        if (btnStato) {
+          cambiaStatoAuto(btnStato.dataset.cambiaStato, btnStato.dataset.stato);
+          return;
+        }
+        const btnHome = e.target.closest('[data-cambia-home]');
+        if (btnHome) {
+          cambiaHomepageAuto(btnHome.dataset.cambiaHome, btnHome.dataset.homeVal === '1');
+          return;
+        }
+        const btnFoto = e.target.closest('[data-apri-foto]');
+        if (btnFoto) {
+          apriModale(btnFoto.dataset.apriFoto);
+          return;
+        }
+        const btnCover = e.target.closest('[data-set-cover]');
+        if (btnCover && idModale) {
+          impostaCopertina(idModale, btnCover.dataset.setCover);
+          return;
+        }
+        const btnDel = e.target.closest('[data-del-extra]');
+        if (btnDel && idModale) {
+          eliminaFotoExtra(idModale, btnDel.dataset.delExtra, false);
+          return;
+        }
+        const btnFiltro = e.target.closest('[data-filtro]');
+        if (btnFiltro) {
+          filtroStato = btnFiltro.dataset.filtro;
+          $$('[data-filtro]').forEach(b => {
+            const att = b.dataset.filtro === filtroStato;
+            if (b.classList.contains('vt-chip')) b.setAttribute('aria-pressed', String(att));
+            if (b.classList.contains('db-kpi')) b.classList.toggle('is-active', att);
+          });
+          disegnaTutto();
+        }
+      });
+
+      $('#db-cerca').addEventListener('input', e => {
+        cercaTesto = e.target.value;
+        disegnaTutto();
+      });
+      $('#db-select-stato').addEventListener('change', e => {
+        filtroStato = e.target.value;
+        $$('[data-filtro]').forEach(b => {
+          const att = b.dataset.filtro === filtroStato;
+          if (b.classList.contains('vt-chip')) b.setAttribute('aria-pressed', String(att));
+          if (b.classList.contains('db-kpi')) b.classList.toggle('is-active', att);
+        });
+        disegnaTutto();
+      });
+      $('#db-select-categoria').addEventListener('change', e => {
+        filtroCategoria = e.target.value;
+        disegnaTutto();
+      });
+      $('#db-select-marca').addEventListener('change', e => {
+        filtroMarca = e.target.value;
+        disegnaTutto();
+      });
+      $('#db-select-ordine').addEventListener('change', async e => {
+        filtroOrdine = e.target.value;
+        disegnaTutto();
+        try {
+          await fetch(API_BASE + '/api/imposta-ordine', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ordine: filtroOrdine })
+          });
+          notificaSitoLive();
+          toast('✓ Ordine predefinito del sito aggiornato in tempo reale!');
+        } catch (err) {}
+      });
+
+      $('#mod-chiudi').addEventListener('click', () => $('#db-modal').close());
+      $('#db-modal').addEventListener('click', e => { if (e.target === $('#db-modal')) $('#db-modal').close(); });
+
+      const dz = $('#mod-dropzone');
+      const inp = $('#mod-file-input');
+      dz.addEventListener('click', () => inp.click());
+      inp.addEventListener('change', e => { if (idModale) caricaFotoDragDrop(idModale, e.target.files); inp.value = ''; });
+      dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('is-dragover'); });
+      dz.addEventListener('dragleave', () => dz.classList.remove('is-dragover'));
+      dz.addEventListener('drop', e => {
+        e.preventDefault();
+        dz.classList.remove('is-dragover');
+        if (idModale) caricaFotoDragDrop(idModale, e.dataTransfer.files);
+      });
+
+      $('#mod-apri-cartella').addEventListener('click', () => {
+        if (!idModale) return;
+        fetch(API_BASE + '/api/apri-cartella', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: idModale }) });
+      });
+
+      $('#mod-svuota-extra').addEventListener('click', () => {
+        if (idModale && confirm('Rimuovere tutte le foto extra di questa auto?')) {
+          eliminaFotoExtra(idModale, null, true);
+        }
+      });
+
+      $('#btn-apri-drive').addEventListener('click', () => {
+        fetch(API_BASE + '/api/apri-cartella', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      });
+
+      $('#btn-sync-drive').addEventListener('click', async () => {
+        toast('Lettura cartella foto locale in corso…');
+        await caricaStato();
+        notificaSitoLive();
+        toast('Cartella foto locale sincronizzata!');
+      });
+
+      $('#btn-sync-as24').addEventListener('click', async () => {
+        const btn = $('#btn-sync-as24');
+        const logBox = $('#db-log');
+        btn.disabled = true;
+        btn.textContent = '⏳ Scaricamento da AutoScout24 in corso…';
+        logBox.textContent = 'Collegamento ad AutoScout24 in corso (circa 20-30 secondi per 20 auto)…\n';
+        logBox.classList.remove('is-hidden');
+        try {
+          const r = await fetch(API_BASE + '/api/aggiorna-autoscout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+          const d = await r.json();
+          if (d && d.ok) {
+            annunci = d.annunci || [];
+            logBox.textContent = d.log || 'Aggiornamento completato.';
+            disegnaTutto();
+            notificaSitoLive();
+            toast('✓ Sincronizzazione da AutoScout24 completata!');
+          } else {
+            logBox.textContent += '\nErrore: ' + (d.errore || 'sconosciuto');
+          }
+        } catch (err) {
+          logBox.textContent += '\nErrore di rete: ' + err;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '🔄 Aggiorna ora da AutoScout24';
+        }
+      });
+
+      caricaStato();
+    })();
+  </script>
+</body>
+</html>

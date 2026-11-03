@@ -149,10 +149,110 @@ FILE_INCLUSI_REPOST = [
 ]
 
 
+def verifica_token_github(token: str) -> tuple[bool, str]:
+    token = (token or "").strip()
+    if not token:
+        return False, "Token vuoto."
+    import urllib.request
+    import urllib.error
+
+    req = urllib.request.Request(
+        "https://api.github.com/repos/Ennesseauto/enneesseauto-vetrina",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "EnneEsseAuto-Setup",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            d = json.loads(r.read().decode("utf-8"))
+            perms = d.get("permissions") or {}
+            if not perms.get("push"):
+                return False, "Il token e' valido ma NON ha il permesso di scrittura ('repo' / 'Contents: Read and write')."
+            return True, "Token GitHub verificato con successo (lettura e scrittura attive)!"
+    except urllib.error.HTTPError as e:
+        if e.code == 401:
+            return (
+                False,
+                "GitHub ha rifiutato il codice (Errore 401: Non autorizzato).\n"
+                "Assicurati di aver incollato il Token generato da GitHub (inizia con 'ghp_' o 'github_pat_')\n"
+                "e NON la password del tuo account GitHub!",
+            )
+        return False, f"Errore HTTP GitHub: {e.code}"
+    except Exception as e:
+        return False, f"Errore di connessione a GitHub: {e}"
+
+
+def chiedi_token_grafico():
+    try:
+        import tkinter as tk
+        from tkinter import messagebox, simpledialog
+        import webbrowser
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+
+        apri = messagebox.askyesno(
+            "Collegamento Cloud GitHub — Enne Esse Auto",
+            "Per permettere al PC del concessionario di inviare le modifiche ('In Arrivo', foto, ecc.) a GitHub,\n"
+            "serve un Token di accesso GitHub (inizia con 'ghp_...').\n\n"
+            "Vuoi aprire ora la pagina di GitHub per generarlo in 10 secondi?\n"
+            "(Ti bastera' spuntare la casella 'repo' e cliccare il pulsante verde 'Generate token' in fondo).",
+            parent=root,
+        )
+        if apri:
+            webbrowser.open("https://github.com/settings/tokens/new?description=Dashboard+Enne+Esse+Auto&scopes=repo")
+
+        while True:
+            tok = simpledialog.askstring(
+                "Incolla il Token GitHub (ghp_...)",
+                "Incolla qui il Token generato su GitHub (inizia con ghp_... o github_pat_...):\n"
+                "ATTENZIONE: non inserire la password dell'account GitHub, ma il codice ghp_...",
+                parent=root,
+            )
+            if not tok or not tok.strip():
+                root.destroy()
+                return
+            ok, msg = verifica_token_github(tok.strip())
+            if ok:
+                FILE_AUTH.write_text(json.dumps({"token": tok.strip()}, indent=2) + "\n", encoding="utf-8")
+                messagebox.showinfo("Token Verificato!", msg, parent=root)
+                root.destroy()
+                return
+            else:
+                riprova = messagebox.askretrycancel("Token non valido", msg, parent=root)
+                if not riprova:
+                    root.destroy()
+                    return
+    except Exception as e:
+        print(f"Errore finestra grafica: {e}")
+
+
 def main():
-    if len(sys.argv) > 1 and sys.argv[1].strip():
+    if "--chiedi-token" in sys.argv:
+        chiedi_token_grafico()
+    elif len(sys.argv) > 1 and sys.argv[1].strip():
         token_arg = sys.argv[1].strip()
-        FILE_AUTH.write_text(json.dumps({"token": token_arg}, indent=2) + "\n", encoding="utf-8")
+        ok, msg = verifica_token_github(token_arg)
+        if ok:
+            FILE_AUTH.write_text(json.dumps({"token": token_arg}, indent=2) + "\n", encoding="utf-8")
+            print(f"[OK] {msg}")
+        else:
+            print(f"\n[ERRORE TOKEN] {msg}\n")
+            if FILE_AUTH.exists():
+                FILE_AUTH.unlink()
+
+    if FILE_AUTH.exists():
+        try:
+            tok_esistente = json.loads(FILE_AUTH.read_text(encoding="utf-8")).get("token", "")
+            ok, _ = verifica_token_github(tok_esistente)
+            if not ok:
+                print("     [!] Rimossa chiave .gh_auth.json non valida (non era un token ghp_... autorizzato).")
+                FILE_AUTH.unlink()
+        except Exception:
+            FILE_AUTH.unlink()
 
     prefisso = "Dashboard_EnneEsseAuto_Setup"
     with zipfile.ZipFile(ZIP_DEST, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
@@ -171,13 +271,39 @@ def main():
                     rel_extra = f.relative_to(CARTELLA_REPOST).as_posix()
                     zf.write(f, f"{prefisso}/repost/{rel_extra}")
 
+    # Genera anche il mini-pacchetto di aggiornamento rapido per PC con Dashboard già installata
+    zip_patch = CARTELLA_ROOT / "Aggiorna_Collegamento_Cloud.zip"
+    bat_patch = BAT_INSTALLER.replace(
+        "repost\\strumenti\\installa_dashboard.py",
+        "strumenti\\attiva_cloud_patch.py",
+    ).replace(
+        "AVVIO INSTALLAZIONE DASHBOARD PARCO AUTO",
+        "AGGIORNAMENTO COLLEGAMENTO CLOUD GITHUB",
+    )
+    pref_patch = "Aggiorna_Collegamento_Cloud"
+    with zipfile.ZipFile(zip_patch, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zp:
+        zp.writestr(f"{pref_patch}/Attiva Collegamento Cloud GitHub.bat", bat_patch)
+        for rel_p in (
+            "gestione-foto.html",
+            "embed/motorexpo-embed.js",
+            "strumenti/attiva_cloud_patch.py",
+            "strumenti/cloud_github.py",
+            "strumenti/server_foto.py",
+            "strumenti/foto_drive.py",
+            "strumenti/.gh_auth.json",
+        ):
+            src_p = CARTELLA_REPOST / rel_p
+            if src_p.exists() and src_p.is_file():
+                zp.write(src_p, f"{pref_patch}/{rel_p}")
+
     dim_kb = ZIP_DEST.stat().st_size / 1024
-    print(f"[OK] Creato pacchetto: {ZIP_DEST}")
-    print(f"     Dimensione: {dim_kb:.1f} KB")
+    dim_patch_kb = zip_patch.stat().st_size / 1024
+    print(f"[OK] Creato pacchetto completo: {ZIP_DEST} ({dim_kb:.1f} KB)")
+    print(f"[OK] Creato pacchetto aggiornamento rapido: {zip_patch} ({dim_patch_kb:.1f} KB)")
     if FILE_AUTH.exists():
-        print("     [✓] Chiave Cloud GitHub (.gh_auth.json) inclusa nel pacchetto ZIP!")
+        print("     [OK] Chiave Cloud GitHub (.gh_auth.json) inclusa in entrambi i pacchetti ZIP!")
     else:
-        print("     [i] Chiave Cloud GitHub non ancora presente (verrà chiesta all'installazione).")
+        print("     [i] Chiave Cloud GitHub verrà chiesta automaticamente all'avvio.")
 
 
 if __name__ == "__main__":

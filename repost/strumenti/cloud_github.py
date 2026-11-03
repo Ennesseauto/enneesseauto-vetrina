@@ -91,7 +91,7 @@ def esegui_pull_iniziale():
     if token:
         try:
             _svuota_cache_cdn()
-            for rel in ("dati/annunci.js", "dati/annunci.json", "dati/stato_manuale.json"):
+            for rel in ("dati/annunci.js", "dati/annunci.json"):
                 url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/repost/{rel}?ref={BRANCH}"
                 req = urllib.request.Request(
                     url,

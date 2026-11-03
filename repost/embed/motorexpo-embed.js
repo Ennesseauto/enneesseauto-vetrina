@@ -489,12 +489,17 @@
     setTimeout(aggiorna, 40);
   }
 
-  /* ---------- BLOCCO 1: Homepage - Divisione Auto (In Salone) ---------- */
+  /* ---------- BLOCCO 1: Homepage - Divisione Auto (Solo selezionate "Homepage") ---------- */
   function disegnaBloccoSalone(box) {
     box.classList.add('ees-mx-root');
-    const inSalone = annunci
+    const tutteInSalone = annunci
       .filter(a => (a.stato || 'salone') === 'salone')
       .sort(confrontaDaDashboard);
+
+    const selezionateHome = tutteInSalone.filter(a => a.homepage === true);
+    // Se il concessionario ha targato almeno 1 auto come "Homepage", mostra solo quelle targate;
+    // se non ne ha ancora targata nessuna, mostra provvisoriamente quelle in salone.
+    const inSalone = selezionateHome.length > 0 ? selezionateHome : tutteInSalone;
 
     if (!inSalone.length) {
       box.innerHTML = '';
@@ -514,28 +519,28 @@
     collegaCarosello(box);
   }
 
-  /* ---------- BLOCCO 2: Homepage - Vetture in Arrivo (Auto-Hide se 0) ---------- */
+  /* ---------- BLOCCO 2: Homepage - Vetture in Arrivo (Auto-Hide intera sezione se 0) ---------- */
   function disegnaBloccoArrivo(box) {
     box.classList.add('ees-mx-root');
     const inArrivo = annunci
       .filter(a => a.stato === 'arrivo')
       .sort(confrontaDaDashboard);
 
-    // Se siamo dentro una riga dedicata di Duda (.dmRespRow) o una <section>, la nascondiamo/mostriamo per intero
+    // Nasconde l'intera riga/sezione di Duda (.dmRespRow / section, inclusi titolo "VETTURE IN ARRIVO" e pulsante)
+    // quando non ci sono auto in arrivo!
     const rigaDuda = box.closest('.dmRespRow') || box.closest('section');
-    const nascondiRiga = box.dataset.nascondiRiga !== 'false';
 
     if (!inArrivo.length) {
       box.innerHTML = '';
-      box.style.display = 'none';
-      if (rigaDuda && nascondiRiga && !rigaDuda.querySelector('#ees-home-salone')) {
-        rigaDuda.style.display = 'none';
+      box.style.setProperty('display', 'none', 'important');
+      if (rigaDuda && !rigaDuda.querySelector('#ees-home-salone')) {
+        rigaDuda.style.setProperty('display', 'none', 'important');
       }
       return;
     }
 
-    box.style.display = '';
-    if (rigaDuda) rigaDuda.style.display = '';
+    box.style.removeProperty('display');
+    if (rigaDuda) rigaDuda.style.removeProperty('display');
 
     box.innerHTML = `
       <div class="ees-mx-vista-lista" data-ees-vista-lista>
@@ -944,7 +949,7 @@
 
   /* ---------- Rendering Globale e Sincronizzazione Live ---------- */
   function calcolaImpronta(lista, ord) {
-    return `${ord || 'autoscout'}||` + lista.map(a => `${a.id}:${a.stato || 'salone'}:${(a.foto || [])[0] || ''}:${(a.foto || []).length}:${a.prezzo}`).join('|');
+    return `${ord || 'autoscout'}||` + lista.map(a => `${a.id}:${a.stato || 'salone'}:${a.homepage ? 1 : 0}:${(a.foto || [])[0] || ''}:${(a.foto || []).length}:${a.prezzo}`).join('|');
   }
 
   function disegnaTutto() {
