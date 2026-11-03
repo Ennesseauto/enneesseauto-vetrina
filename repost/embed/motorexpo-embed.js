@@ -986,7 +986,7 @@
   async function sincronizzaConCloud(forza = false) {
     if (!CLOUD_ORIGIN || serverLocaleAttivo) return;
     const ora = Date.now();
-    if (!forza && ora - ultimoCheckCloud < 30000) return;
+    if (!forza && ora - ultimoCheckCloud < 120000) return;
     ultimoCheckCloud = ora;
     try {
       let urlDati = `${cloudOriginDinamico}/repost/dati/annunci.json?t=${Math.floor(ora / 8000)}`;
@@ -1048,7 +1048,7 @@
   sincronizzaConCloud(true);
   sincronizzaConDashboardLocale();
 
-  // Se la Dashboard locale è attiva sul PC, aggiorna ogni 2 secondi; altrimenti controlla il Cloud H24 ogni 30 secondi
+  // Se la Dashboard locale è attiva sul PC, aggiorna ogni 2 secondi in tempo reale
   window.__EES_TIMER__ = setInterval(() => {
     if (annunci.length) {
       const blocchi = $$('#ees-home-salone, [data-ees-blocco="salone"], #ees-catalogo-completo, [data-ees-blocco="catalogo"]');
@@ -1058,13 +1058,11 @@
     }
     if (serverLocaleAttivo) {
       sincronizzaConDashboardLocale();
-    } else {
-      sincronizzaConCloud(false);
     }
   }, 2000);
   window.addEventListener('focus', () => {
     sincronizzaConDashboardLocale();
-    sincronizzaConCloud(true);
+    sincronizzaConCloud(false);
   });
   if (typeof BroadcastChannel !== 'undefined') {
     const bc = new BroadcastChannel('repost_live');
