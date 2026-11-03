@@ -493,17 +493,36 @@
       aggiornaTemaUI();
 
       /* ---------- Caricamento stato dal server ---------- */
+      let setHomeFallback = new Set();
+
+      function applicaDatiServer(d) {
+        if (!d || !d.ok) return;
+        serverAttivo = true;
+        if (d.ordineSito) {
+          const parti = String(d.ordineSito).split('|home:');
+          filtroOrdine = parti[0] || 'autoscout';
+          if (parti.length > 1) {
+            setHomeFallback = new Set(parti[1].split(',').map(s => s.trim()).filter(Boolean));
+          }
+          if ($('#db-select-ordine')) $('#db-select-ordine').value = filtroOrdine;
+        }
+        annunci = (d.annunci || []).map(a => {
+          const inH = (a.homepage === true) || setHomeFallback.has(a.id) || setHomeFallback.has(String(a.id || '').slice(0, 8));
+          return Object.assign({}, a, { homepage: inH });
+        });
+      }
+
+      function stringaOrdineConHome() {
+        const ids = annunci.filter(a => a.homepage && (a.stato || 'salone') === 'salone').map(a => a.id);
+        return ids.length ? `${filtroOrdine}|home:${ids.join(',')}` : filtroOrdine;
+      }
+
       async function caricaStato() {
         try {
           const r = await fetch(API_BASE + '/api/stato');
           const d = await r.json();
           if (d && d.ok) {
-            serverAttivo = true;
-            annunci = d.annunci || [];
-            if (d.ordineSito) {
-              filtroOrdine = d.ordineSito;
-              if ($('#db-select-ordine')) $('#db-select-ordine').value = filtroOrdine;
-            }
+            applicaDatiServer(d);
             if (d.aggiornato) {
               const dt = new Date(d.aggiornato);
               const strDt = dt.toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -684,7 +703,7 @@
           });
           const d = await r.json();
           if (d && d.ok) {
-            annunci = d.annunci || [];
+            applicaDatiServer(d);
             disegnaTutto();
             notificaSitoLive();
             const et = nuovoStato === 'arrivo' ? 'Vetture in Arrivo' : (nuovoStato === 'venduta' ? 'Vendute (Archivio)' : 'In Salone');
@@ -696,15 +715,38 @@
       }
 
       async function cambiaHomepageAuto(id, inHomepage) {
+        // Aggiorna subito l'interfaccia al clic
+        const bersaglio = annunci.find(a => a.id === id);
+        if (bersaglio) bersaglio.homepage = Boolean(inHomepage);
+        if (inHomepage) setHomeFallback.add(id);
+        else setHomeFallback.delete(id);
+        disegnaTutto();
+
         try {
           const r = await fetch(API_BASE + '/api/cambia-homepage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, homepage: inHomepage })
           });
-          const d = await r.json();
-          if (d && d.ok) {
-            annunci = d.annunci || [];
+          if (r.ok) {
+            const d = await r.json();
+            if (d && d.ok) {
+              applicaDatiServer(d);
+              disegnaTutto();
+              notificaSitoLive();
+              toast(inHomepage ? '★ Auto aggiunta al carosello della Homepage!' : 'Auto rimossa dal carosello della Homepage (resta visibile in Autovetture).');
+              return;
+            }
+          }
+          // Fallback automatico compatibile anche con il vecchio processo server_foto.py in RAM
+          const r2 = await fetch(API_BASE + '/api/imposta-ordine', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ordine: stringaOrdineConHome() })
+          });
+          const d2 = await r2.json();
+          if (d2 && d2.ok) {
+            applicaDatiServer(d2);
             disegnaTutto();
             notificaSitoLive();
             toast(inHomepage ? '★ Auto aggiunta al carosello della Homepage!' : 'Auto rimossa dal carosello della Homepage (resta visibile in Autovetture).');
@@ -723,7 +765,7 @@
           });
           const d = await r.json();
           if (d && d.ok) {
-            annunci = d.annunci || [];
+            applicaDatiServer(d);
             disegnaTutto();
             notificaSitoLive();
             toast('★ Nuova immagine di copertina attiva sul sito!');
@@ -741,7 +783,7 @@
         });
         const d = await r.json();
         if (d && d.ok) {
-          annunci = d.annunci || [];
+          applicaDatiServer(d);
           disegnaTutto();
           notificaSitoLive();
           toast(tutte ? 'Tutte le foto extra rimosse dal sito.' : 'Foto extra rimossa dal sito.');
@@ -773,7 +815,7 @@
         });
         const d = await r.json();
         if (d && d.ok) {
-          annunci = d.annunci || [];
+          applicaDatiServer(d);
           disegnaTutto();
           notificaSitoLive();
           const a = annunci.find(x => x.id === id);
@@ -890,7 +932,7 @@
           await fetch(API_BASE + '/api/imposta-ordine', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ordine: filtroOrdine })
+            body: JSON.stringify({ ordine: stringaOrdineConHome() })
           });
           notificaSitoLive();
           toast('✓ Ordine predefinito del sito aggiornato in tempo reale!');

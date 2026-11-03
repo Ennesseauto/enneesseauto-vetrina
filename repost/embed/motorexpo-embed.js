@@ -56,12 +56,29 @@
   let cambiPrezzo = new Map(((variazioni && Array.isArray(variazioni.prezzi)) ? variazioni.prezzi : []).map(p => [p.id, p]));
   let ultimaImpronta = '';
 
+  function ordineBase() {
+    return String(ordineSito || 'autoscout').split('|')[0] || 'autoscout';
+  }
+
+  function idsHomeDaOrdine() {
+    const parti = String(ordineSito || '').split('|home:');
+    if (parti.length < 2 || !parti[1].trim()) return new Set();
+    return new Set(parti[1].split(',').map(s => s.trim()).filter(Boolean));
+  }
+
+  function autoInHomepage(a) {
+    if (a.homepage === true) return true;
+    const setFallback = idsHomeDaOrdine();
+    return setFallback.has(a.id) || setFallback.has(String(a.id || '').slice(0, 8));
+  }
+
   function confrontaDaDashboard(a, b) {
-    if (ordineSito === 'default') return (a.ordineDefault ?? a.ordineAs24 ?? 999) - (b.ordineDefault ?? b.ordineAs24 ?? 999);
-    if (ordineSito === 'recenti') return String(b.pubblicato || '').localeCompare(String(a.pubblicato || ''));
-    if (ordineSito === 'prezzoSu') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity);
-    if (ordineSito === 'prezzoGiu') return (b.prezzo ?? -1) - (a.prezzo ?? -1);
-    if (ordineSito === 'menoFoto') return (a.foto || []).length - (b.foto || []).length;
+    const ord = ordineBase();
+    if (ord === 'default') return (a.ordineDefault ?? a.ordineAs24 ?? 999) - (b.ordineDefault ?? b.ordineAs24 ?? 999);
+    if (ord === 'recenti') return String(b.pubblicato || '').localeCompare(String(a.pubblicato || ''));
+    if (ord === 'prezzoSu') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity);
+    if (ord === 'prezzoGiu') return (b.prezzo ?? -1) - (a.prezzo ?? -1);
+    if (ord === 'menoFoto') return (a.foto || []).length - (b.foto || []).length;
     return (a.ordineAs24 ?? 999) - (b.ordineAs24 ?? 999);
   }
 
@@ -496,7 +513,7 @@
       .filter(a => (a.stato || 'salone') === 'salone')
       .sort(confrontaDaDashboard);
 
-    const selezionateHome = tutteInSalone.filter(a => a.homepage === true);
+    const selezionateHome = tutteInSalone.filter(autoInHomepage);
     // Se il concessionario ha targato almeno 1 auto come "Homepage", mostra solo quelle targate;
     // se non ne ha ancora targata nessuna, mostra provvisoriamente quelle in salone.
     const inSalone = selezionateHome.length > 0 ? selezionateHome : tutteInSalone;

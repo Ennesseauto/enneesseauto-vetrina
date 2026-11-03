@@ -60,6 +60,12 @@ def leggi_stato_server_attivo() -> dict | None:
 
 def ferma_vecchio_server():
     try:
+        req = urllib.request.Request("http://127.0.0.1:8765/api/spegnimento", data=b"{}", method="POST")
+        urllib.request.urlopen(req, timeout=2).read()
+        time.sleep(0.5)
+    except Exception:
+        pass
+    try:
         subprocess.run(
             [
                 "powershell",
@@ -292,16 +298,32 @@ def main():
         cloud_github._push_via_api_https(token_valido, "Sincronizzazione auto In Arrivo da Dashboard concessionario")
         cloud_github._svuota_cache_cdn()
 
-        # Riavvia il server aggiornato in background
+        # Riavvia il server aggiornato in background direttamente con sys.executable
+        py_exe = sys.executable
         vbs = strumenti_dest / "avvia_server_silenzioso.vbs"
-        if vbs.exists():
-            subprocess.Popen(["wscript.exe", str(vbs)], cwd=str(cartella_dash / "repost"))
-        else:
-            subprocess.Popen(
-                [sys.executable, str(strumenti_dest / "server_foto.py"), "--no-browser"],
-                cwd=str(cartella_dash / "repost"),
-                creationflags=0x08000000 if sys.platform.startswith("win") else 0,
-            )
+        vbs.write_text(
+            "' Avvia il server locale della Dashboard (server_foto.py) in background senza finestra nera\r\n"
+            'Set fso = CreateObject("Scripting.FileSystemObject")\r\n'
+            'Set shell = CreateObject("WScript.Shell")\r\n'
+            "cartellaStrumenti = fso.GetParentFolderName(WScript.ScriptFullName)\r\n"
+            "cartellaRepost = fso.GetParentFolderName(cartellaStrumenti)\r\n"
+            'fileLog = cartellaRepost & "\\dati\\server_foto.log"\r\n'
+            f'pyExe = "{py_exe}"\r\n'
+            'comando = "cmd /c cd /d """ & cartellaRepost & """ && set PYTHONIOENCODING=utf-8 && (""" & pyExe & """ ""strumenti\\server_foto.py"" --no-browser > """ & fileLog & """ 2>&1 || python ""strumenti\\server_foto.py"" --no-browser >> """ & fileLog & """ 2>&1 || py -3 ""strumenti\\server_foto.py"" --no-browser >> """ & fileLog & """ 2>&1)"\r\n'
+            "shell.Run comando, 0, False\r\n",
+            encoding="utf-8",
+        )
+        subprocess.Popen(
+            [py_exe, str(strumenti_dest / "server_foto.py"), "--no-browser"],
+            cwd=str(cartella_dash / "repost"),
+            creationflags=0x08000000 if sys.platform.startswith("win") else 0,
+        )
+        for _ in range(15):
+            if leggi_stato_server_attivo() is not None:
+                break
+            time.sleep(0.3)
+
+        webbrowser.open("http://127.0.0.1:8765/repost/gestione-foto.html")
 
         elenco_txt = "\n".join(auto_in_arrivo_nomi) if auto_in_arrivo_nomi else "(Nessuna auto attualmente segnata 'In Arrivo' in questa cartella)"
         messagebox.showinfo(
