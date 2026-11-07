@@ -344,108 +344,251 @@
       @media (max-width: 820px) { .ees-mx-griglia { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
       @media (max-width: 540px) { .ees-mx-griglia { grid-template-columns: minmax(0, 1fr) !important; } }
 
-      /* Scheda Singola Auto (Inline o Overlay dedicato) */
-      .ees-mx-scheda-top {
+      /* Scheda Singola Auto (Inline o Overlay dedicato) — Layout Opzione 2 */
+      .ees-mx-root .ees-mx-scheda-wrap {
+        width: 100% !important; max-width: 1240px !important; margin: 0 auto !important;
+        overflow: hidden !important; background: #0e0f12 !important;
+        border: 1px solid rgba(255,255,255,0.14) !important; border-radius: 16px !important; padding: 22px !important;
+      }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-scheda-wrap { padding: 14px 12px !important; border-radius: 14px !important; }
+      }
+      .ees-mx-root .ees-mx-scheda-top {
         display: flex !important; justify-content: space-between !important; align-items: center !important;
         flex-wrap: wrap !important; gap: 12px !important; margin-bottom: 20px !important;
         padding-bottom: 14px !important; border-bottom: 1px solid var(--ees-bordo) !important;
       }
-      .ees-mx-torna {
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-scheda-top {
+          flex-direction: column !important; align-items: flex-start !important;
+          gap: 8px !important; margin-bottom: 14px !important; padding-bottom: 12px !important;
+        }
+      }
+      .ees-mx-root .ees-mx-scheda-briciole {
+        font-size: 13px !important; color: var(--ees-tenue) !important; line-height: 1.35 !important; word-break: break-word !important;
+      }
+      .ees-mx-root .ees-mx-torna {
         display: inline-flex !important; align-items: center !important; gap: 8px !important;
-        background: #1a1b1e !important; color: #fff !important; border: 1px solid var(--ees-bordo) !important;
+        background: #1a1b1e !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.2) !important;
         padding: 9px 16px !important; border-radius: 999px !important; font-size: 13.5px !important;
         font-weight: 700 !important; cursor: pointer !important; text-decoration: none !important;
       }
-      .ees-mx-torna:hover { border-color: var(--ees-arancio) !important; color: var(--ees-arancio) !important; }
-      .ees-mx-dettaglio {
-        display: grid !important; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) !important; gap: 28px !important; align-items: start !important; width: 100% !important; max-width: 100% !important;
+      .ees-mx-root .ees-mx-torna:hover { border-color: var(--ees-arancio) !important; color: var(--ees-arancio) !important; }
+      .ees-mx-root .ees-mx-dettaglio {
+        display: grid !important; grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr) !important;
+        gap: 24px !important; align-items: start !important; width: 100% !important; max-width: 100% !important;
       }
-      .ees-mx-dettaglio > * { min-width: 0 !important; max-width: 100% !important; overflow: hidden !important; }
-      @media (max-width: 920px) { .ees-mx-dettaglio { grid-template-columns: minmax(0, 1fr) !important; } }
-      .ees-mx-palco {
+      .ees-mx-root .ees-mx-dettaglio > * { min-width: 0 !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; }
+      @media (max-width: 920px) {
+        .ees-mx-root .ees-mx-dettaglio {
+          grid-template-columns: minmax(0, 1fr) !important; gap: 16px !important;
+        }
+      }
+      .ees-mx-root .ees-mx-palco {
         position: relative !important; width: 100% !important; max-width: 100% !important;
-        height: 460px !important; max-height: 62vh !important; background: #070708 !important;
-        border-radius: 14px !important; overflow: hidden !important; border: 1px solid var(--ees-bordo) !important;
+        height: 420px !important; max-height: 420px !important; background: #070708 !important;
+        border-radius: 12px !important; overflow: hidden !important; border: 1px solid var(--ees-bordo) !important;
       }
-      @media (max-width: 640px) { .ees-mx-palco { height: 270px !important; } }
-      .ees-mx-palco img {
-        width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important;
-        object-fit: cover !important; display: block !important; cursor: zoom-in !important; margin: 0 auto !important;
+      .ees-mx-root .ees-mx-palco img {
+        width: 100% !important; height: 420px !important; max-width: 100% !important; max-height: 420px !important;
+        object-fit: contain !important; background: #070708 !important; display: block !important; cursor: zoom-in !important; margin: 0 auto !important;
       }
-      .ees-mx-palco__pill {
-        position: absolute !important; bottom: 12px !important; left: 12px !important;
+      .ees-mx-root .ees-mx-palco .ees-mx-freccia--sx { left: 10px !important; }
+      .ees-mx-root .ees-mx-palco .ees-mx-freccia--dx { right: 10px !important; }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-palco { height: 245px !important; max-height: 245px !important; }
+        .ees-mx-root .ees-mx-palco img { height: 245px !important; max-height: 245px !important; object-fit: cover !important; }
+        .ees-mx-root .ees-mx-palco .ees-mx-freccia { width: 36px !important; height: 36px !important; }
+      }
+      .ees-mx-root .ees-mx-palco__pill {
+        position: absolute !important; bottom: 10px !important; left: 10px !important;
         background: rgba(10,10,12,0.85) !important; color: #fff !important;
-        padding: 5px 12px !important; border-radius: 999px !important; font-size: 12.5px !important; font-weight: 700 !important;
+        padding: 5px 11px !important; border-radius: 999px !important; font-size: 12px !important; font-weight: 700 !important;
       }
-      .ees-mx-palco__zoom {
-        position: absolute !important; bottom: 12px !important; right: 12px !important;
+      .ees-mx-root .ees-mx-palco__zoom {
+        position: absolute !important; bottom: 10px !important; right: 10px !important;
         background: rgba(10,10,12,0.85) !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.2) !important;
-        padding: 6px 12px !important; border-radius: 999px !important; font-size: 12.5px !important; font-weight: 600 !important;
-        display: inline-flex !important; align-items: center !important; gap: 6px !important; cursor: pointer !important;
+        padding: 5px 11px !important; border-radius: 999px !important; font-size: 12px !important; font-weight: 600 !important;
+        display: inline-flex !important; align-items: center !important; gap: 5px !important; cursor: pointer !important;
       }
-      .ees-mx-miniature {
-        display: flex !important; width: 100% !important; max-width: 100% !important; gap: 8px !important; overflow-x: auto !important;
-        padding: 12px 2px 6px !important; scrollbar-width: thin;
+      .ees-mx-root .ees-mx-miniature {
+        display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+        width: 100% !important; max-width: 100% !important; height: 78px !important; max-height: 78px !important;
+        gap: 8px !important; overflow-x: auto !important; overflow-y: hidden !important;
+        padding: 10px 2px !important; align-items: center !important; scrollbar-width: thin;
       }
-      .ees-mx-miniatura {
-        width: 82px !important; min-width: 82px !important; max-width: 82px !important;
-        height: 62px !important; min-height: 62px !important; max-height: 62px !important;
-        flex: 0 0 82px !important;
-        border-radius: 8px !important; overflow: hidden !important; border: 2px solid transparent !important;
-        padding: 0 !important; cursor: pointer !important; background: #000 !important; opacity: 0.65 !important;
+      .ees-mx-root .ees-mx-miniatura {
+        width: 78px !important; min-width: 78px !important; max-width: 78px !important;
+        height: 58px !important; min-height: 58px !important; max-height: 58px !important;
+        flex: 0 0 78px !important; border-radius: 7px !important; overflow: hidden !important;
+        border: 2px solid transparent !important; padding: 0 !important; margin: 0 !important;
+        cursor: pointer !important; background: #000 !important; opacity: 0.65 !important; display: inline-block !important;
       }
-      .ees-mx-miniatura[aria-current="true"] { border-color: var(--ees-arancio) !important; opacity: 1 !important; }
-      .ees-mx-miniatura img {
-        width: 82px !important; height: 62px !important; max-width: 82px !important; max-height: 62px !important;
-        object-fit: cover !important; display: block !important;
+      .ees-mx-root .ees-mx-miniatura[aria-current="true"] { border-color: var(--ees-arancio) !important; opacity: 1 !important; }
+      .ees-mx-root .ees-mx-miniatura img {
+        width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important;
+        object-fit: cover !important; display: block !important; margin: 0 !important;
       }
-      .ees-mx-riepilogo {
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-miniature { height: 66px !important; max-height: 66px !important; gap: 6px !important; padding: 8px 2px !important; }
+        .ees-mx-root .ees-mx-miniatura {
+          width: 66px !important; min-width: 66px !important; max-width: 66px !important;
+          height: 50px !important; min-height: 50px !important; max-height: 50px !important; flex: 0 0 66px !important;
+        }
+      }
+      .ees-mx-root .ees-mx-riepilogo {
         background: #141416 !important; border: 1px solid var(--ees-bordo) !important;
-        border-radius: 14px !important; padding: 22px !important;
+        border-radius: 14px !important; padding: 22px !important; width: 100% !important;
       }
-      .ees-mx-riepilogo__marca { margin: 0 0 4px !important; font-size: 13px !important; font-weight: 700 !important; text-transform: uppercase !important; color: var(--ees-tenue) !important; }
-      .ees-mx-riepilogo__titolo { margin: 0 0 6px !important; font-size: 26px !important; font-weight: 800 !important; color: #fff !important; line-height: 1.2 !important; }
-      .ees-mx-riepilogo__versione { margin: 0 0 14px !important; font-size: 14.5px !important; color: #d0d3da !important; }
-      .ees-mx-riepilogo__prezzo { margin: 0 0 18px !important; font-size: 30px !important; font-weight: 800 !important; color: var(--ees-arancio) !important; }
-      .ees-mx-fatti {
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-riepilogo { padding: 16px 14px !important; border-radius: 12px !important; }
+      }
+      .ees-mx-root .ees-mx-riepilogo__marca {
+        margin: 0 0 6px !important; font-size: 12.5px !important; font-weight: 700 !important;
+        text-transform: uppercase !important; color: var(--ees-tenue) !important;
+        display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 6px !important;
+      }
+      .ees-mx-root .ees-mx-riepilogo__titolo {
+        margin: 0 0 6px !important; font-size: 26px !important; font-weight: 800 !important;
+        color: #fff !important; line-height: 1.2 !important; word-break: break-word !important;
+      }
+      .ees-mx-root .ees-mx-riepilogo__versione {
+        margin: 0 0 14px !important; font-size: 14px !important; color: #d0d3da !important;
+        line-height: 1.4 !important; word-break: break-word !important;
+      }
+      .ees-mx-root .ees-mx-riepilogo__prezzo {
+        margin: 0 0 16px !important; font-size: 30px !important; font-weight: 800 !important;
+        color: var(--ees-arancio) !important; line-height: 1.15 !important;
+      }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-riepilogo__titolo { font-size: 21px !important; }
+        .ees-mx-root .ees-mx-riepilogo__versione { font-size: 13px !important; margin-bottom: 12px !important; }
+        .ees-mx-root .ees-mx-riepilogo__prezzo { font-size: 26px !important; margin-bottom: 14px !important; }
+      }
+      /* Griglia 2x3 Ariosa per i 6 dati principali (Etichetta sopra + Valore a capo sotto) */
+      .ees-mx-root .ees-mx-fatti {
         list-style: none !important; margin: 0 0 18px !important; padding: 0 !important;
-        display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important;
+        display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important;
       }
-      .ees-mx-fatto {
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-fatti { gap: 8px !important; margin-bottom: 16px !important; }
+      }
+      @media (max-width: 340px) {
+        .ees-mx-root .ees-mx-fatti { grid-template-columns: minmax(0, 1fr) !important; }
+      }
+      .ees-mx-root .ees-mx-fatto {
         background: rgba(255,255,255,0.03) !important; border: 1px solid var(--ees-bordo) !important;
-        border-radius: 10px !important; padding: 10px 12px !important; display: flex !important; flex-direction: column !important; gap: 2px !important;
+        border-radius: 10px !important; padding: 10px 12px !important;
+        display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+        justify-content: center !important; gap: 4px !important; min-width: 0 !important;
       }
-      .ees-mx-fatto span { font-size: 11.5px !important; color: var(--ees-tenue) !important; display: inline-flex !important; align-items: center !important; gap: 5px !important; }
-      .ees-mx-fatto strong { font-size: 14px !important; color: #fff !important; }
-      .ees-mx-azioni { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-top: 16px !important; }
-      .ees-mx-btn {
+      .ees-mx-root .ees-mx-fatto span {
+        font-size: 11px !important; font-weight: 700 !important; text-transform: uppercase !important;
+        letter-spacing: 0.03em !important; color: var(--ees-tenue) !important;
+        display: inline-flex !important; align-items: center !important; gap: 5px !important;
+        width: 100% !important; line-height: 1.2 !important;
+      }
+      .ees-mx-root .ees-mx-fatto span .ees-mx-ico {
+        width: 15px !important; height: 15px !important; color: var(--ees-arancio) !important; flex-shrink: 0 !important;
+      }
+      .ees-mx-root .ees-mx-fatto strong {
+        font-size: 14px !important; font-weight: 800 !important; color: #fff !important;
+        line-height: 1.25 !important; word-break: break-word !important; display: block !important; width: 100% !important;
+      }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-fatto { padding: 9px 10px !important; }
+        .ees-mx-root .ees-mx-fatto span { font-size: 10px !important; }
+        .ees-mx-root .ees-mx-fatto strong { font-size: 13.5px !important; }
+      }
+      /* Pulsanti Azione (Affiancati su PC, impilati a tutta larghezza 1 per riga su Telefono) */
+      .ees-mx-root .ees-mx-azioni {
+        display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-top: 16px !important;
+      }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-azioni { grid-template-columns: 1fr !important; gap: 10px !important; }
+      }
+      .ees-mx-root .ees-mx-btn {
         display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important;
         padding: 13px 18px !important; border-radius: 10px !important; font-size: 14.5px !important; font-weight: 700 !important;
-        text-decoration: none !important; cursor: pointer !important; border: 1px solid transparent !important;
+        text-decoration: none !important; cursor: pointer !important; border: 1px solid transparent !important; width: 100% !important;
       }
-      .ees-mx-btn--arancio { background: var(--ees-arancio) !important; color: #fff !important; }
-      .ees-mx-btn--contorno { background: #1e2024 !important; color: #fff !important; border-color: rgba(255,255,255,0.22) !important; }
-      .ees-mx-blocco {
-        margin-top: 26px !important; background: #141416 !important; border: 1px solid var(--ees-bordo) !important;
+      .ees-mx-root .ees-mx-btn--arancio { background: var(--ees-arancio) !important; color: #fff !important; }
+      .ees-mx-root .ees-mx-btn--contorno {
+        background: #1a261f !important; color: #fff !important; border-color: rgba(37,211,102,0.4) !important;
+      }
+      .ees-mx-root .ees-mx-btn--contorno .ees-mx-ico { color: #25D366 !important; }
+      .ees-mx-root .ees-mx-blocco {
+        margin-top: 22px !important; background: #141416 !important; border: 1px solid var(--ees-bordo) !important;
         border-radius: 14px !important; padding: 22px !important;
       }
-      .ees-mx-blocco h2 { margin: 0 0 16px !important; font-size: 19px !important; font-weight: 800 !important; color: #fff !important; }
-      .ees-mx-tecnici {
-        display: grid !important; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important; gap: 10px 22px !important; margin: 0 !important;
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-blocco { margin-top: 16px !important; padding: 16px 14px !important; border-radius: 12px !important; }
       }
-      .ees-mx-tecnici div {
-        display: flex !important; justify-content: space-between !important; padding: 8px 0 !important;
-        border-bottom: 1px solid rgba(255,255,255,0.08) !important; font-size: 13.5px !important;
+      .ees-mx-root .ees-mx-blocco h2 {
+        margin: 0 0 14px !important; font-size: 18px !important; font-weight: 800 !important; color: #fff !important;
       }
-      .ees-mx-tecnici dt { color: var(--ees-tenue) !important; }
-      .ees-mx-tecnici dd { margin: 0 !important; font-weight: 700 !important; color: #fff !important; text-align: right !important; }
-      .ees-mx-equip {
-        display: grid !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 18px !important;
+      /* Scheda Tecnica a Riquadri con Etichetta sopra e Valore a capo sotto */
+      .ees-mx-root .ees-mx-tecnici {
+        display: grid !important; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important;
+        gap: 10px !important; margin: 0 !important;
       }
-      .ees-mx-equip h3 { margin: 0 0 8px !important; font-size: 14px !important; color: var(--ees-arancio) !important; text-transform: uppercase !important; }
-      .ees-mx-equip ul { margin: 0 !important; padding-left: 18px !important; color: #d5d7de !important; font-size: 13.5px !important; line-height: 1.6 !important; }
-      .ees-mx-descr { color: #d5d7de !important; font-size: 14.5px !important; line-height: 1.65 !important; }
-      .ees-mx-descr p { margin: 0 0 10px !important; }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-tecnici { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+        .ees-mx-root .ees-mx-tecnici .ees-mx-tecnico--wide { grid-column: 1 / -1 !important; }
+      }
+      @media (max-width: 340px) {
+        .ees-mx-root .ees-mx-tecnici { grid-template-columns: minmax(0, 1fr) !important; }
+      }
+      .ees-mx-root .ees-mx-tecnici div {
+        display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+        justify-content: flex-start !important; gap: 3px !important; padding: 10px 12px !important;
+        background: rgba(255,255,255,0.025) !important; border: 1px solid rgba(255,255,255,0.08) !important;
+        border-radius: 10px !important; min-width: 0 !important;
+      }
+      .ees-mx-root .ees-mx-tecnici dt {
+        font-size: 10.5px !important; font-weight: 700 !important; text-transform: uppercase !important;
+        letter-spacing: 0.03em !important; color: var(--ees-tenue) !important; margin: 0 !important; line-height: 1.2 !important;
+      }
+      .ees-mx-root .ees-mx-tecnici dd {
+        margin: 0 !important; font-size: 13.5px !important; font-weight: 700 !important; color: #fff !important;
+        text-align: left !important; line-height: 1.3 !important; word-break: break-word !important; width: 100% !important;
+      }
+      /* Equipaggiamento a Tendine Richiudibili su Mobile e Griglia su Desktop */
+      .ees-mx-root .ees-mx-equip {
+        display: grid !important; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+        gap: 14px !important; align-items: start !important;
+      }
+      @media (max-width: 640px) {
+        .ees-mx-root .ees-mx-equip { grid-template-columns: minmax(0, 1fr) !important; gap: 9px !important; }
+      }
+      .ees-mx-root .ees-mx-equip-acc {
+        background: rgba(255,255,255,0.025) !important; border: 1px solid rgba(255,255,255,0.09) !important;
+        border-radius: 10px !important; overflow: hidden !important;
+      }
+      .ees-mx-root .ees-mx-equip-sum {
+        list-style: none !important; cursor: pointer !important; padding: 11px 14px !important;
+        font-size: 13px !important; font-weight: 800 !important; color: var(--ees-arancio) !important;
+        text-transform: uppercase !important; letter-spacing: 0.04em !important;
+        display: flex !important; align-items: center !important; justify-content: space-between !important;
+        gap: 8px !important; user-select: none !important;
+      }
+      .ees-mx-root .ees-mx-equip-sum::-webkit-details-marker { display: none !important; }
+      .ees-mx-root .ees-mx-equip-sum small {
+        color: var(--ees-tenue) !important; font-size: 11.5px !important; font-weight: 600 !important; margin-left: 4px !important;
+      }
+      .ees-mx-root .ees-mx-equip-toggle::after {
+        content: "+" !important; font-size: 17px !important; font-weight: 800 !important; color: #fff !important; line-height: 1 !important;
+      }
+      .ees-mx-root .ees-mx-equip-acc[open] .ees-mx-equip-toggle::after {
+        content: "−" !important; color: var(--ees-arancio) !important;
+      }
+      .ees-mx-root .ees-mx-equip-acc ul {
+        margin: 0 !important; padding: 0 14px 12px 30px !important; color: #d5d7de !important;
+        font-size: 13px !important; line-height: 1.6 !important; border-top: 1px solid rgba(255,255,255,0.06) !important;
+        padding-top: 10px !important;
+      }
+      .ees-mx-root .ees-mx-descr { color: #d5d7de !important; font-size: 14.5px !important; line-height: 1.65 !important; word-break: break-word !important; }
+      .ees-mx-root .ees-mx-descr p { margin: 0 0 10px !important; }
       /* Modal Scheda Auto (quando aperta dalla Homepage) & Lightbox */
       .ees-mx-overlay {
         position: fixed !important; inset: 0 !important; z-index: 999998 !important;
@@ -712,12 +855,12 @@
     const wa = linkWhatsApp(msg);
     const giu = ribassato(a);
     const riepilogo = [
-      ['Chilometraggio', fmtKm(a.km), ICO.strada],
-      ['Cambio', a.cambio, ICO.cambio],
       ['Immatricolazione', fmtImm(a.immatricolazione), ICO.calendario],
+      ['Chilometraggio', fmtKm(a.km), ICO.strada],
       ['Carburante', a.carburante, ICO.carburante],
-      ['Potenza', a.kw ? `${a.kw} kW (${a.cv} CV)` : null, ICO.potenza],
-      ['Carrozzeria', a.carrozzeria, ICO.auto]
+      ['Cambio', a.cambio, ICO.cambio],
+      ['Potenza', a.cv ? `${a.cv} CV (${a.kw} kW)` : (a.kw ? `${a.kw} kW` : null), ICO.potenza],
+      ['Carrozzeria', a.carrozzeria || a.colore, ICO.auto]
     ].filter(([, v]) => v);
 
     const righeTecniche = [
@@ -738,26 +881,27 @@
     ].filter(([, v]) => v);
 
     const altre = annunci.filter(x => x.id !== a.id).slice(0, 4);
+    const apriTuttiAcc = typeof window !== 'undefined' && window.innerWidth > 768;
 
     return `
-      <div style="width:100% !important;max-width:1240px !important;margin:0 auto !important;overflow:hidden !important;background:#0e0f12 !important;border:1px solid rgba(255,255,255,0.14) !important;border-radius:16px !important;padding:22px !important;">
-      <div class="ees-mx-scheda-top" style="display:flex !important;justify-content:space-between !important;align-items:center !important;flex-wrap:wrap !important;gap:12px !important;margin-bottom:20px !important;padding-bottom:14px !important;border-bottom:1px solid rgba(255,255,255,0.12) !important;">
-        <button type="button" class="ees-mx-torna" data-ees-chiudi-scheda style="display:inline-flex !important;align-items:center !important;gap:8px !important;background:#1a1b1e !important;color:#fff !important;border:1px solid rgba(255,255,255,0.2) !important;padding:9px 16px !important;border-radius:999px !important;font-size:13.5px !important;font-weight:700 !important;cursor:pointer !important;">${ICO.sx} Torna a tutte le auto</button>
-        <span style="font-size:13px;color:var(--ees-tenue)">${esc(a.marca)} / <strong style="color:#fff">${esc(a.modello)}</strong></span>
+      <div class="ees-mx-scheda-wrap">
+      <div class="ees-mx-scheda-top">
+        <button type="button" class="ees-mx-torna" data-ees-chiudi-scheda>${ICO.sx} Torna a tutte le auto</button>
+        <span class="ees-mx-scheda-briciole">${esc(a.marca)} / <strong style="color:#fff">${esc(a.modello)}</strong></span>
       </div>
 
-      <div class="ees-mx-dettaglio" style="display:grid !important;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) !important;gap:24px !important;align-items:start !important;width:100% !important;max-width:100% !important;">
-        <div style="min-width:0 !important;width:100% !important;max-width:100% !important;overflow:hidden !important;">
-          <div class="ees-mx-palco" data-ees-palco style="position:relative !important;width:100% !important;max-width:100% !important;height:400px !important;max-height:400px !important;background:#070708 !important;border-radius:12px !important;overflow:hidden !important;border:1px solid rgba(255,255,255,0.12) !important;">
-            ${n ? `<img data-ees-foto-grande src="${esc(foto(a.foto[0], 'grande'))}" alt="${esc(nome)}" width="800" height="600" style="width:100% !important;height:400px !important;max-width:100% !important;max-height:400px !important;object-fit:contain !important;background:#070708 !important;display:block !important;cursor:zoom-in !important;margin:0 auto !important;">` : ''}
+      <div class="ees-mx-dettaglio">
+        <div>
+          <div class="ees-mx-palco" data-ees-palco>
+            ${n ? `<img data-ees-foto-grande src="${esc(foto(a.foto[0], 'grande'))}" alt="${esc(nome)}" width="800" height="600">` : ''}
             ${n > 1 ? `
               <button class="ees-mx-freccia ees-mx-freccia--sx" type="button" data-ees-passo="-1" aria-label="Foto precedente">${ICO.sx}</button>
               <button class="ees-mx-freccia ees-mx-freccia--dx" type="button" data-ees-passo="1" aria-label="Foto successiva">${ICO.dx}</button>` : ''}
             ${n ? `<span class="ees-mx-palco__pill" data-ees-contatore>1 / ${n}</span>
               <button type="button" class="ees-mx-palco__zoom" data-ees-zoom>${ICO.zoom} Schermo intero</button>` : ''}
           </div>
-          ${n > 1 ? `<div class="ees-mx-miniature" data-ees-miniature style="display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;width:100% !important;max-width:100% !important;height:80px !important;max-height:80px !important;gap:8px !important;overflow-x:auto !important;overflow-y:hidden !important;padding:10px 2px !important;align-items:center !important;">
-            ${a.foto.map((f, i) => `<button type="button" class="ees-mx-miniatura" data-ees-indice="${i}" aria-current="${i === 0}" style="width:78px !important;min-width:78px !important;max-width:78px !important;height:58px !important;min-height:58px !important;max-height:58px !important;flex:0 0 78px !important;border-radius:6px !important;overflow:hidden !important;padding:0 !important;margin:0 !important;background:#000 !important;cursor:pointer !important;display:inline-block !important;"><img src="${esc(foto(f, 'mini'))}" alt="" loading="lazy" width="78" height="58" style="width:78px !important;height:58px !important;max-width:78px !important;max-height:58px !important;object-fit:cover !important;display:block !important;margin:0 !important;"></button>`).join('')}
+          ${n > 1 ? `<div class="ees-mx-miniature" data-ees-miniature>
+            ${a.foto.map((f, i) => `<button type="button" class="ees-mx-miniatura" data-ees-indice="${i}" aria-current="${i === 0}"><img src="${esc(foto(f, 'mini'))}" alt="" loading="lazy" width="78" height="58"></button>`).join('')}
           </div>` : ''}
         </div>
 
@@ -770,8 +914,8 @@
             ${riepilogo.map(([k, v, ico]) => `<li class="ees-mx-fatto"><span>${ico}${esc(k)}</span><strong>${esc(v)}</strong></li>`).join('')}
           </ul>
           <div class="ees-mx-azioni">
-            <a class="ees-mx-btn ees-mx-btn--arancio" href="${esc(CONTATTI.telefonoHref)}">${ICO.telefono} Chiama</a>
-            <a class="ees-mx-btn ees-mx-btn--contorno" href="${esc(wa)}" target="_blank" rel="noopener">${ICO.whatsapp} WhatsApp</a>
+            <a class="ees-mx-btn ees-mx-btn--arancio" href="${esc(CONTATTI.telefonoHref)}">${ICO.telefono} Chiama Ora</a>
+            <a class="ees-mx-btn ees-mx-btn--contorno" href="${esc(wa)}" target="_blank" rel="noopener">${ICO.whatsapp} Scrivici su WhatsApp</a>
           </div>
         </aside>
       </div>
@@ -779,7 +923,7 @@
       <section class="ees-mx-blocco">
         <h2>Dati tecnici</h2>
         <dl class="ees-mx-tecnici">
-          ${righeTecniche.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}
+          ${righeTecniche.map(([k, v]) => `<div${String(v).length > 20 ? ' class="ees-mx-tecnico--wide"' : ''}><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}
         </dl>
       </section>
 
@@ -787,7 +931,7 @@
       <section class="ees-mx-blocco">
         <h2>Equipaggiamento</h2>
         <div class="ees-mx-equip">
-          ${a.accessori.map(g => `<div><h3>${esc(g.categoria)}</h3><ul>${g.voci.map(v => `<li>${esc(v)}</li>`).join('')}</ul></div>`).join('')}
+          ${a.accessori.map((g, i) => `<details class="ees-mx-equip-acc"${apriTuttiAcc || i === 0 ? ' open' : ''}><summary class="ees-mx-equip-sum"><span>${esc(g.categoria)} <small>(${(g.voci || []).length})</small></span><span class="ees-mx-equip-toggle" aria-hidden="true"></span></summary><ul>${(g.voci || []).map(v => `<li>${esc(v)}</li>`).join('')}</ul></details>`).join('')}
         </div>
       </section>` : ''}
 
