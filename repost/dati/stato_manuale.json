@@ -723,6 +723,8 @@
       "https://prod.pictures.autoscout24.net/listing-images/ac3eb04b-b391-4dd4-a831-3411ef4474cd_dd6a2742-98d8-4f77-b34b-fd6879735e73.jpg"
     ]
   },
-  "homepage": {},
+  "homepage": {
+    "c4241040-6c56-48c7-89e4-d9895cdb9e17": true
+  },
   "ordine_sito": "autoscout"
 }
