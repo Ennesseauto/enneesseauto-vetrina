@@ -25,7 +25,8 @@
     "80440d32-c7b2-41b6-80a4-12e1b4e18ba1": "arrivo",
     "ac3eb04b-b391-4dd4-a831-3411ef4474cd": "arrivo",
     "c2a7fc4b-271b-4ef5-be8d-0bd181e2c2aa": "salone",
-    "a9b77d54-c870-46ca-b525-29823275b985": "salone"
+    "a9b77d54-c870-46ca-b525-29823275b985": "salone",
+    "224b68b1-553c-4feb-861b-84ecb0c5d5db": "salone"
   },
   "copertine": {
     "9cb863b6-b5f4-46e4-ace2-e2cbe84cf877": "https://prod.pictures.autoscout24.net/listing-images/9cb863b6-b5f4-46e4-ace2-e2cbe84cf877_3383b583-b842-4e7d-bc65-77e16ab272e3.jpg"
@@ -722,6 +723,22 @@
       "https://prod.pictures.autoscout24.net/listing-images/a9b77d54-c870-46ca-b525-29823275b985_b68fe809-2c18-410d-bfb5-89257ba4b478.jpg",
       "https://prod.pictures.autoscout24.net/listing-images/a9b77d54-c870-46ca-b525-29823275b985_40a0b11f-ba71-40de-97a7-5fd0d43af87e.jpg",
       "https://prod.pictures.autoscout24.net/listing-images/a9b77d54-c870-46ca-b525-29823275b985_65044b03-91fa-4137-9e63-5cc2f7186fc8.jpg"
+    ],
+    "224b68b1-553c-4feb-861b-84ecb0c5d5db": [
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_433fddc5-ecf7-4791-b831-c8687a98c990.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_aefdccfd-4cb5-4620-b5ab-07fbed1a735e.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_ddf59d3a-91bd-40c4-bdb9-366164d3e180.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_95309cea-f351-4acf-9380-14f667b11b2a.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_128f28a5-a1a0-423d-9563-482b79fe8918.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_f6168cc9-579e-4781-a70f-fd160055221f.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_246ab768-5534-4561-ad6c-a5952772bd4b.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_fc7b77bd-7271-4a43-8a60-42138522013a.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_eba505ea-1362-41e8-8bca-ed3626f8ff81.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_a8c6a831-93e6-47c7-b8f6-e1e633ff851f.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_92de162f-30af-41eb-a79e-f4d4c6a8f89c.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_25faef4b-35eb-4865-a309-7f331bdc0795.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_4a49a6ca-0480-49a0-bda0-142a15fc6d00.jpg",
+      "https://prod.pictures.autoscout24.net/listing-images/224b68b1-553c-4feb-861b-84ecb0c5d5db_42b15a49-ca46-4700-9279-5390f452b367.jpg"
     ]
   },
   "homepage": {
